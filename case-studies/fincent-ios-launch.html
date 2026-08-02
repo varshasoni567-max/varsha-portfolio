@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Building Fincent's product marketing from scratch — Varsha Soni</title>
+<meta name="description" content="How I built Fincent's product marketing function from scratch: positioning, web infrastructure, an iOS launch, and a scalable demo program.">
+<style>
+  :root {
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bg:     #F7F4EC;
+    --ink:    #131210;
+    --pink:   #D69C8C;
+    --card:   #FFFFFF;
+    --muted:  #6B6558;
+    --line:   #131210;
+    --shadow: 5px 5px 0 var(--line);
+    --shadow-sm: 3px 3px 0 var(--line);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  .label {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 13px 22px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--line); }
+  .btn-dark { background: var(--ink); color: var(--bg); }
+  .btn-sm { padding: 9px 16px; font-size: 13px; box-shadow: 2px 2px 0 var(--line); }
+  .btn-sm:hover { box-shadow: 0 0 0 var(--line); }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(247,244,236,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-brand {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-brand .dot { width: 10px; height: 10px; background: var(--pink); border: 2px solid var(--line); border-radius: 3px; display: inline-block; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.75;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  /* ── CASE PAGE ── */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .back-link:hover { color: var(--ink); }
+
+  .cs-header { padding: 40px 0 8px; }
+  .cs-header h1 { font-size: clamp(26px, 4vw, 38px); margin: 14px 0 14px; max-width: 24ch; }
+  .cs-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+  .cs-meta .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); }
+  .cs-meta strong { color: var(--ink); font-family: var(--font-sans); }
+  .cs-intro { font-size: 17px; color: var(--muted); margin-bottom: 8px; }
+
+  section.cs-block { padding: 36px 0; border-top: 2px solid var(--line); }
+  section.cs-block:first-of-type { border-top: none; }
+  .cs-block .label { display: block; margin-bottom: 16px; }
+
+  /* Outcomes grid */
+  .outcome-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .outcome-tile {
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 12px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    flex: 0 1 calc((100% - 48px) / 5);
+  }
+  .outcome-num { font-family: var(--font-sans); font-weight: 700; font-size: 19px; color: var(--ink); margin-bottom: 4px; line-height: 1.15; }
+  .outcome-label { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+  /* Body copy */
+  .cs-block p { color: var(--muted); font-size: 15.5px; margin-bottom: 14px; }
+  .cs-block p:last-child { margin-bottom: 0; }
+
+  /* What I Did — collapsible sub-cards */
+  .did-list { display: flex; flex-direction: column; gap: 12px; }
+  .did-item { border-left: 2px solid var(--pink); padding-left: 18px; }
+  .did-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .did-item summary::-webkit-details-marker { display: none; }
+  .did-item summary::marker { content: ''; }
+  .did-item h3 { font-size: 16px; color: var(--ink); }
+  .did-item summary:hover h3 { color: var(--pink); }
+  .did-item .chev { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); transition: transform 0.15s ease; }
+  .did-item[open] .chev { transform: rotate(180deg); }
+  .did-body { padding: 4px 0 10px; }
+  .did-item p { font-size: 15px; margin-bottom: 8px; }
+  .did-item .assets { font-size: 13px; color: var(--muted); font-style: italic; }
+  .did-item .assets a { color: var(--ink); font-style: normal; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+  .did-body ul { list-style: none; margin: 2px 0 10px; display: flex; flex-direction: column; gap: 10px; }
+  .did-body ul li { font-size: 15px; color: var(--muted); position: relative; padding-left: 16px; }
+  .did-body ul li::before { content: '•'; position: absolute; left: 0; color: var(--pink); }
+  .did-body ul li strong { color: var(--ink); }
+  .item-heading { display: block; font-size: 15.5px; color: var(--ink); margin-bottom: 6px; }
+  .item-desc { margin: 0; }
+
+  .tag-line { font-size: 13.5px; color: var(--muted); margin-top: 16px; }
+  .tag-line a { color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+  .tag-line .sep { color: var(--pink); margin: 0 6px; }
+
+  /* Press proof + citation lines */
+  .proof-block { margin-top: 16px; }
+  .proof-block-label {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .proof-shots { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+  .proof-shot {
+    display: block;
+    width: 230px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .proof-shot:hover { transform: translateY(-3px); box-shadow: 4px 4px 0 var(--pink); }
+  .proof-shot img { display: block; width: 100%; height: 140px; object-fit: cover; object-position: top; }
+  .proof-shot-cap { display: block; font-size: 12px; font-weight: 700; color: var(--ink); padding: 8px 11px; border-top: 2px solid var(--line); }
+  .cite-line { font-size: 14px; color: var(--muted); line-height: 1.65; }
+  .cite-line a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .cite-line a:hover { color: var(--pink); }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; margin-bottom: 22px; }
+  .pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 12.5px;
+    padding: 7px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+  }
+  .pill-link:hover { background: var(--pink); border-color: var(--pink); transform: translateY(-1px); }
+
+  .proof-shot-full {
+    display: block;
+    margin-top: 16px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .proof-shot-full:hover { transform: translateY(-3px); box-shadow: 4px 4px 0 var(--pink); }
+  .proof-shot-full img { display: block; width: 100%; height: auto; }
+
+  .cs-cta { display: flex; gap: 14px; flex-wrap: wrap; padding-top: 8px; }
+
+  footer {
+    padding: 40px 32px 56px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 760px) {
+    .outcome-tile { flex-basis: calc(50% - 6px); }
+    section.cs-block { padding: 28px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-brand"><span class="dot"></span>Varsha Soni</a>
+    <ul class="nav-links" style="list-style:none;">
+      <li><a href="../index.html#work">Case Studies</a></li>
+      <li><a href="../index.html#ai">AI Tools</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="../cv.html" class="btn btn-sm" target="_blank">CV ↓</a>
+      <a href="mailto:varshasoni567@gmail.com" class="btn btn-sm btn-dark">Get in touch</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── HEADER ── -->
+  <div class="cs-header">
+    <a href="../index.html#work" class="back-link">← All case studies</a>
+    <h1>Building Fincent's product marketing</h1>
+    <div class="cs-meta">
+      <strong>Fincent</strong>
+      <span class="dot"></span>
+      <span>Senior Product Marketing Manager</span>
+      <span class="dot"></span>
+      <span>Mar 2023 – Apr 2024</span>
+    </div>
+    <p class="cs-intro">As Senior PMM at a 4.7-star bookkeeping startup, I built the product marketing foundation from the ground up: positioning, web presence, feature pages, self-serve tools, content engine, and a scalable demo program.</p>
+  </div>
+
+  <!-- ── OUTCOMES ── -->
+  <section class="cs-block">
+    <span class="label">Outcomes I Drove</span>
+    <div class="outcome-grid">
+      <div class="outcome-tile"><div class="outcome-num">2.5x</div><div class="outcome-label">iOS app download growth (23 to 60) within tenure</div></div>
+      <div class="outcome-tile"><div class="outcome-num">12.5%</div><div class="outcome-label">Demo-to-close rate across group demo program</div></div>
+      <div class="outcome-tile"><div class="outcome-num">24</div><div class="outcome-label">Total prospects demoed across 5 group sessions</div></div>
+      <div class="outcome-tile"><div class="outcome-num">300+</div><div class="outcome-label">Monthly knowledge base views across 80 to 100 customers</div></div>
+      <div class="outcome-tile"><div class="outcome-num">4.7/5</div><div class="outcome-label">Capterra rating</div></div>
+    </div>
+  </section>
+
+  <!-- ── CONTEXT ── -->
+  <section class="cs-block">
+    <span class="label">Context</span>
+    <p>Fincent is an AI-powered bookkeeping platform combining automated software with human bookkeeper oversight for US small businesses. When I joined in March 2023, the product had 80 to 100 customers, no mobile presence, and acquisition running almost entirely on direct outreach and word of mouth. There was no product marketing infrastructure: no feature pages, no positioning, no self-serve discovery, no content engine.</p>
+    <p>The category made this harder than it looks. Bookkeeping SaaS is dominated by QuickBooks and Bench, buyer awareness is low, and switching providers is high-effort and emotionally fraught. The job was to build a marketing foundation that could work in a high-trust, high-friction category, where every touchpoint either builds confidence or erodes it.</p>
+    <a class="proof-shot-full" href="https://fincent.com/product" target="_blank" rel="noopener">
+      <img src="images/fincent-context-product.png" alt="Fincent product overview page — Take the hassle out of bookkeeping and taxes">
+    </a>
+  </section>
+
+  <!-- ── WHAT I DID ── -->
+  <section class="cs-block">
+    <span class="label">What I Did and What It Moved</span>
+    <div class="did-list">
+      <details class="did-item" open>
+        <summary><h3>Lead Generation, Messaging, and GTM</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Built platform and feature messaging across customer categories, expanding on existing ICP and value mapping foundations. That messaging became the through-line for every customer communication during my tenure.</p>
+          <ul>
+            <li>
+              <strong class="item-heading">Web Infrastructure</strong>
+              <p class="item-desc">Pricing page, product overview, self-guided product tour, 6 individual feature pages each with a product video, and 3 competitor alternative pages targeting prospects actively evaluating Pilot and Bench.</p>
+              <div class="proof-block">
+                <div class="proof-shots">
+                  <a class="proof-shot" href="https://fincent.com/pricing" target="_blank" rel="noopener">
+                    <img src="images/fincent-web-pricing.png" alt="Fincent pricing page — Simple, transparent pricing" loading="lazy">
+                    <span class="proof-shot-cap">Pricing Page ↗</span>
+                  </a>
+                  <a class="proof-shot" href="https://fincent.com/features/get-paid" target="_blank" rel="noopener">
+                    <img src="images/fincent-web-getpaid.png" alt="Fincent Get Paid feature page" loading="lazy">
+                    <span class="proof-shot-cap">Get Paid Feature ↗</span>
+                  </a>
+                  <a class="proof-shot" href="https://fincent.com/pilot-alternative" target="_blank" rel="noopener">
+                    <img src="images/fincent-web-pilotalt.png" alt="Fincent Pilot alternative competitor page" loading="lazy">
+                    <span class="proof-shot-cap">Pilot Alternative ↗</span>
+                  </a>
+                </div>
+                <p class="cite-line">Also live:</p>
+                <div class="pill-row">
+                  <a class="pill-link" href="https://fincent.com/bench-alternative" target="_blank" rel="noopener">Bench Alternative ↗</a>
+                  <a class="pill-link" href="https://fincent.com/product-tour" target="_blank" rel="noopener">Product Tour ↗</a>
+                  <a class="pill-link" href="https://fincent.com/features/heads-up" target="_blank" rel="noopener">Financial Dashboard ↗</a>
+                  <a class="pill-link" href="https://fincent.com/features/timeline" target="_blank" rel="noopener">Transaction Timeline ↗</a>
+                  <a class="pill-link" href="https://fincent.com/features/directory" target="_blank" rel="noopener">Vendor Directory ↗</a>
+                </div>
+              </div>
+            </li>
+            <li>
+              <strong class="item-heading">iOS App Launch</strong>
+              <p class="item-desc">Led the v1.0 launch end to end: messaging, launch page, email campaign, and in-app notification sequence. Targeted existing customers first to build review credibility before broader promotion. Downloads grew from 23 to 60 within tenure, representing 60 to 75% of the customer base activating on mobile.</p>
+              <div class="pill-row">
+                <a class="pill-link" href="assets/fincent-ios-launch-plan.pdf" target="_blank" rel="noopener">iOS Launch Plan ↗</a>
+                <a class="pill-link" href="https://fincent.com/mobile-app" target="_blank" rel="noopener">Live App Page ↗</a>
+              </div>
+            </li>
+            <li>
+              <strong class="item-heading">SEO Content</strong>
+              <p class="item-desc">7 how-to guides targeting small business owners at specific high-intent moments: filing deadlines, tax credits, runway management, business credit. Published in a 27-day burst in November and December, timed for peak financial planning season.</p>
+              <p class="cite-line">How-To Guides:</p>
+              <div class="pill-row">
+                <a class="pill-link" href="https://fincent.com/how-to/get-a-tax-extension" target="_blank" rel="noopener">Tax Extensions ↗</a>
+                <a class="pill-link" href="https://fincent.com/how-to/how-to-organize-your-financials-for-tax-season" target="_blank" rel="noopener">Tax Season Prep ↗</a>
+                <a class="pill-link" href="https://fincent.com/how-to/build-business-credit-for-your-startup" target="_blank" rel="noopener">Building Business Credit ↗</a>
+                <a class="pill-link" href="https://fincent.com/how-to/survive-a-short-runway" target="_blank" rel="noopener">Managing a Short Runway ↗</a>
+                <a class="pill-link" href="https://fincent.com/how-to/prevent-penalties-for-4th-quarter-estimated-tax-payments" target="_blank" rel="noopener">Estimated Tax Payments ↗</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>Deal Velocity</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Redesigned one-on-one demos into group sessions of 5 to 10 prospects, built around a talk track that led with the prospect's problem before showing the product. Owned the full program: invitation copy, landing page, registration flow, slide deck, and post-demo follow-up sequence. Across 5 sessions, 24 prospects were demoed and 3 converted at 12.5%, matching one-on-one conversion rates while dramatically increasing throughput.</p>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>Product Adoption</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Led product GTM end to end for all new launches and feature releases, owning feature messaging, positioning, and customer communication from announcement through adoption. Built and maintained the product knowledge base to serve three functions simultaneously: CS deflection, onboarding supplement for new customers in their first week, and feature education to drive adoption of advanced functionality. Reached 300 monthly views across 80 to 100 customers, roughly 3 to 4 visits per customer per month.</p>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>Foundational and Scaling Work</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Built the knowledge base as a scalable system, not just a set of articles, with a process and structure that could be handed off and added to as the team grew. Established feature messaging documentation and positioning frameworks that gave future launches a repeatable starting point. Maintained ongoing reporting across marketing channels to keep the team oriented on what was working.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ── WHAT IT ADDED UP TO ── -->
+  <section class="cs-block">
+    <span class="label">What It Added Up To</span>
+    <p>In just over a year I built Fincent's product marketing function from scratch: positioning, web infrastructure, feature pages, self-serve discovery, a content engine, a scalable demo program, and a knowledge base. Every initiative was designed for a category where trust is the product. The iOS launch, the competitor pages, the how-to guides, and the demo program were all expressions of the same underlying bet: earn confidence before asking for the sale.</p>
+    <p class="tag-line"><a href="https://fincent.com/mobile-app" target="_blank" rel="noopener">iOS App</a><span class="sep">·</span><a href="https://fincent.com/product-tour" target="_blank" rel="noopener">Product Tour</a><span class="sep">·</span><a href="https://fincent.com/pilot-alternative" target="_blank" rel="noopener">Pilot Alternative</a><span class="sep">·</span><a href="https://fincent.com/bench-alternative" target="_blank" rel="noopener">Bench Alternative</a></p>
+  </section>
+
+  <div class="cs-cta">
+    <a href="../index.html#work" class="btn btn-dark">← Back to case studies</a>
+    <a href="mailto:varshasoni567@gmail.com" class="btn">Get in touch</a>
+  </div>
+
+</div>
+
+<footer>© 2026 Varsha Soni · Built with Claude</footer>
+
+</body>
+</html>

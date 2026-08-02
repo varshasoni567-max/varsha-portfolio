@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Turned JustCall's integration directory into a signup channel — Varsha Soni</title>
+<meta name="description" content="How I rebuilt JustCall's integration directory into a signup channel: the HubSpot page rebuild lifted trial signups 48%, SAL-to-customer 25%, and the directory drove 309 signups and 123 demos in 7 months.">
+<style>
+  :root {
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bg:     #F7F4EC;
+    --ink:    #131210;
+    --pink:   #D69C8C;
+    --card:   #FFFFFF;
+    --muted:  #6B6558;
+    --line:   #131210;
+    --shadow: 5px 5px 0 var(--line);
+    --shadow-sm: 3px 3px 0 var(--line);
+
+    /* Content type scale — 4 sizes only: H1, H1's description, H2 (= description size), and a smaller body/description size */
+    --fs-h1: clamp(24px, 4vw, 34px);
+    --fs-desc: 17px;
+    --fs-body: 14px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  .label {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--fs-desc);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 13px 22px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--line); }
+  .btn-dark { background: var(--ink); color: var(--bg); }
+  .btn-sm { padding: 9px 16px; font-size: 13px; box-shadow: 2px 2px 0 var(--line); }
+  .btn-sm:hover { box-shadow: 0 0 0 var(--line); }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(247,244,236,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-brand {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-brand .dot { width: 10px; height: 10px; background: var(--pink); border: 2px solid var(--line); border-radius: 3px; display: inline-block; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.75;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  /* ── CASE PAGE ── */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .back-link:hover { color: var(--ink); }
+
+  .cs-header { padding: 40px 0 8px; }
+  .cs-header h1 { font-size: var(--fs-h1); margin: 14px 0 14px; max-width: 26ch; }
+  .cs-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: var(--fs-body); color: var(--muted); margin-bottom: 18px; }
+  .cs-meta .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); }
+  .cs-meta strong { color: var(--ink); font-family: var(--font-sans); }
+  .cs-intro { font-size: var(--fs-desc); color: var(--muted); margin-bottom: 8px; }
+
+  section.cs-block { padding: 36px 0; border-top: 2px solid var(--line); }
+  section.cs-block:first-of-type { border-top: none; }
+  .cs-block .label { display: block; margin-bottom: 16px; }
+
+  /* Outcomes grid */
+  .outcome-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .outcome-tile {
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 12px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    flex: 0 1 calc((100% - 24px) / 3);
+  }
+  .outcome-num { font-family: var(--font-sans); font-weight: 700; font-size: var(--fs-desc); color: var(--ink); margin-bottom: 4px; line-height: 1.15; }
+  .outcome-label { font-size: var(--fs-body); color: var(--muted); line-height: 1.35; }
+
+  /* Body copy */
+  .cs-block p { color: var(--muted); font-size: var(--fs-body); margin-bottom: 14px; }
+  .cs-block p:last-child { margin-bottom: 0; }
+
+  /* What I Did — collapsible sub-cards */
+  .did-list { display: flex; flex-direction: column; gap: 12px; }
+  .did-item { border-left: 2px solid var(--pink); padding-left: 18px; }
+  .did-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .did-item summary::-webkit-details-marker { display: none; }
+  .did-item summary::marker { content: ''; }
+  .did-item h3 { font-size: var(--fs-desc); color: var(--ink); }
+  .did-item summary:hover h3 { color: var(--pink); }
+  .did-item .chev { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); transition: transform 0.15s ease; }
+  .did-item[open] .chev { transform: rotate(180deg); }
+  .did-body { padding: 4px 0 10px; }
+  .did-item p { font-size: var(--fs-body); margin-bottom: 8px; }
+  .did-item .assets { font-size: var(--fs-body); color: var(--muted); font-style: italic; }
+  .did-item .assets a { color: var(--ink); font-style: normal; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+  .did-body ul { list-style: none; margin: 2px 0 10px; display: flex; flex-direction: column; gap: 10px; }
+  .did-body ul li { font-size: var(--fs-body); color: var(--muted); position: relative; padding-left: 16px; }
+  .did-body ul li::before { content: '•'; position: absolute; left: 0; color: var(--pink); }
+  .did-body ul li strong { color: var(--ink); }
+
+  .num-list { list-style: none; margin: 2px 0 10px; display: flex; flex-direction: column; gap: 12px; }
+  .num-list li { display: flex; gap: 12px; align-items: baseline; padding-left: 0; }
+  .did-body ul.num-list li::before { content: none; }
+  .num-list .num { flex-shrink: 0; font-family: var(--font-sans); font-weight: 700; font-size: var(--fs-body); color: var(--pink); min-width: 20px; }
+  .num-list .num-desc { font-size: var(--fs-body); color: var(--muted); }
+
+  .cite-line { font-size: var(--fs-body); color: var(--muted); line-height: 1.65; margin-top: 10px; }
+  .cite-line a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .cite-line a:hover { color: var(--pink); }
+
+  /* Before/after slider */
+  .ba-slider { width: 90%; margin: 14px auto -22px; }
+  .ba-compare {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 2000 / 1168;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+  }
+  .ba-compare .ba-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+  }
+  .ba-compare .ba-before { clip-path: inset(0 50% 0 0); }
+  .ba-handle-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: var(--card); box-shadow: 0 0 0 1px var(--line); pointer-events: none; }
+  .ba-handle-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--line);
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    color: var(--ink);
+    pointer-events: none;
+  }
+  .ba-tag {
+    position: absolute;
+    top: 10px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--card);
+    pointer-events: none;
+  }
+  .ba-tag-before { left: 10px; }
+  .ba-tag-after { right: 10px; }
+  .ba-range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    -webkit-appearance: none;
+  }
+  .ba-caption { display: flex; justify-content: center; margin-top: 18px; }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+  .pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 12.5px;
+    padding: 7px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+  }
+  .pill-link:hover { background: var(--pink); border-color: var(--pink); transform: translateY(-1px); }
+
+  .tag-line { font-size: var(--fs-body); color: var(--muted); margin-top: 16px; }
+  .tag-line a { color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+  .tag-line .sep { color: var(--pink); margin: 0 6px; }
+
+  .cs-cta { display: flex; gap: 14px; flex-wrap: wrap; padding-top: 8px; }
+
+  footer {
+    padding: 40px 32px 56px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 760px) {
+    .outcome-tile { flex-basis: calc(50% - 6px); }
+    section.cs-block { padding: 28px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-brand"><span class="dot"></span>Varsha Soni</a>
+    <ul class="nav-links" style="list-style:none;">
+      <li><a href="../index.html#work">Case Studies</a></li>
+      <li><a href="../index.html#ai">AI Tools</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="../cv.html" class="btn btn-sm" target="_blank">CV ↓</a>
+      <a href="mailto:varshasoni567@gmail.com" class="btn btn-sm btn-dark">Get in touch</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── HEADER ── -->
+  <div class="cs-header">
+    <a href="../index.html#work" class="back-link">← All case studies</a>
+    <h1>Integrations into a signup channel</h1>
+    <div class="cs-meta">
+      <strong>JustCall</strong>
+      <span class="dot"></span>
+      <span>Product Marketing Manager</span>
+      <span class="dot"></span>
+      <span>Dec 2024 – Feb 2026</span>
+    </div>
+    <p class="cs-intro">HubSpot rebuild lifted trial signups +48%, SAL-to-customer +25%, clicks to pricing +17%. 309 signups and 123 demos followed across the directory in 7 months.</p>
+  </div>
+
+  <!-- ── OUTCOMES ── -->
+  <section class="cs-block">
+    <span class="label">Outcomes I Drove</span>
+    <div class="outcome-grid">
+      <div class="outcome-tile"><div class="outcome-num">123 demos, 309 signups</div><div class="outcome-label">From revamped integration pages over 7 months</div></div>
+      <div class="outcome-tile"><div class="outcome-num">+48%</div><div class="outcome-label">Trial signups from the HubSpot page rebuild, A/B tested against a control</div></div>
+      <div class="outcome-tile"><div class="outcome-num">+25%</div><div class="outcome-label">Sales-accepted-lead to customer, on rebuilt pages</div></div>
+      <div class="outcome-tile"><div class="outcome-num">+17%</div><div class="outcome-label">Clicks to pricing, on rebuilt pages</div></div>
+      <div class="outcome-tile"><div class="outcome-num">+86%</div><div class="outcome-label">Scrolls to footer, on rebuilt pages</div></div>
+      <div class="outcome-tile"><div class="outcome-num">23</div><div class="outcome-label">Integration pages fully revamped out of 70+ audited</div></div>
+    </div>
+  </section>
+
+  <!-- ── CONTEXT ── -->
+  <section class="cs-block">
+    <span class="label">Context</span>
+    <p>JustCall competes in one of the most crowded categories in B2B SaaS: business phone systems and VoIP. Buyers shortlist software by whether it works with the tools they already run, which makes integration and comparison pages the acquisition funnel, not supporting content.</p>
+    <p>The directory was a flat grid of 70+ logos, untouched since launch, never tested against a control, with no tracking on any of it. Every partner page looked the same and said little. Competitor pages had weak differentiation and mismatched CTAs on top of that. The gap wasn't traffic. It was conversion.</p>
+    <div class="ba-slider">
+      <div class="ba-compare" id="hs-ba">
+        <img class="ba-img" src="images/justcall-hubspot-after.png" alt="justcall.io/integration/hubspot after the redesign">
+        <img class="ba-img ba-before" id="hs-ba-before" src="images/justcall-hubspot-before.png" alt="justcall.io/integration/hubspot before the redesign">
+        <div class="ba-handle-line" id="hs-ba-line"></div>
+        <div class="ba-handle-btn" id="hs-ba-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/></svg>
+        </div>
+        <span class="ba-tag ba-tag-before">Before</span>
+        <span class="ba-tag ba-tag-after">After</span>
+        <input type="range" class="ba-range" id="hs-ba-range" min="0" max="100" value="50" aria-label="Drag to compare the HubSpot integration page before and after the redesign">
+      </div>
+      <p class="ba-caption"><a class="pill-link" href="https://justcall.io/integration/hubspot/" target="_blank" rel="noopener">Before and after the HubSpot page rebuild ↗</a></p>
+    </div>
+  </section>
+
+  <!-- ── WHAT I DID ── -->
+  <section class="cs-block">
+    <span class="label">What I Did and What It Moved</span>
+    <div class="did-list">
+      <details class="did-item" open>
+        <summary><h3>Integration Page Rebuild</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <ul class="num-list">
+            <li><span class="num">01</span><span class="num-desc">Started with the flagship: rewrote the HubSpot integration page around the job the integration does for sales and support teams, not the logo pairing.</span></li>
+            <li><span class="num">02</span><span class="num-desc">Rebuilt each page structurally: a new sidebar, tabbed content, section navigation, a clearer path to pricing, and an embedded walkthrough of the integration at work.</span></li>
+            <li><span class="num">03</span><span class="num-desc">A/B tested every major change against a control version, so each new landing page had to prove itself before it stayed.</span></li>
+            <li><span class="num">04</span><span class="num-desc">Turned the winning rebuild into a template for every integration partner page that followed: Salesforce, monday.com, Zoho, and other marketplace listings.</span></li>
+            <li><span class="num">05</span><span class="num-desc">Set up tracking where there had previously been none, so partner pages reported demos and signups for the first time.</span></li>
+          </ul>
+          <p>CRM integrations (Salesforce, HubSpot, Pipedrive) were prioritised first, highest buyer intent and budget signal. New integrations launched during tenure received optimised pages from day one. Marketplace listings across Apollo, Pipedrive, and other partner ecosystems were owned end to end: copy, positioning, design, and delivery.</p>
+          <p class="cite-line">Live integration pages:</p>
+          <div class="pill-row">
+            <a class="pill-link" href="https://justcall.io/integration/" target="_blank" rel="noopener">Integration Directory ↗</a>
+            <a class="pill-link" href="https://justcall.io/integration/hubspot/" target="_blank" rel="noopener">HubSpot ↗</a>
+            <a class="pill-link" href="https://justcall.io/integration/pipedrive/" target="_blank" rel="noopener">Pipedrive ↗</a>
+            <a class="pill-link" href="https://justcall.io/integration/salesforce/" target="_blank" rel="noopener">Salesforce ↗</a>
+            <a class="pill-link" href="https://justcall.io/integration/clay/" target="_blank" rel="noopener">Clay ↗</a>
+            <a class="pill-link" href="https://justcall.io/integration/zoho/" target="_blank" rel="noopener">Zoho ↗</a>
+          </div>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ── WHAT IT ADDED UP TO ── -->
+  <section class="cs-block">
+    <span class="label">What It Added Up To</span>
+    <p>The HubSpot rebuild alone: +48% trial signups, +25% SAL-to-customer, +17% clicks to pricing, +86% scrolls to footer, all against a control. Proof it was structure, not copy, moving buyers: the sidebar, the tabs, the pricing path, the interactive walkthrough.</p>
+    <p>Once that pattern won, every later page inherited it instead of starting from scratch, and the channel compounded. 309 signups and 123 demos followed across the directory in 7 months, the first time the surface had numbers at all.</p>
+    <p class="tag-line"><a href="https://justcall.io/integration/" target="_blank" rel="noopener">Integration Ecosystem</a><span class="sep">·</span><a href="https://justcall.io/integration/pipedrive/" target="_blank" rel="noopener">Pipedrive Partnership</a></p>
+  </section>
+
+  <div class="cs-cta">
+    <a href="../index.html#work" class="btn btn-dark">← Back to case studies</a>
+    <a href="mailto:varshasoni567@gmail.com" class="btn">Get in touch</a>
+  </div>
+
+</div>
+
+<footer>© 2026 Varsha Soni · Built with Claude</footer>
+
+<script>
+(function () {
+  var range = document.getElementById('hs-ba-range');
+  var before = document.getElementById('hs-ba-before');
+  var line = document.getElementById('hs-ba-line');
+  var btn = document.getElementById('hs-ba-btn');
+  if (!range) return;
+  function update(v) {
+    before.style.clipPath = 'inset(0 ' + (100 - v) + '% 0 0)';
+    line.style.left = v + '%';
+    btn.style.left = v + '%';
+  }
+  range.addEventListener('input', function () { update(this.value); });
+  update(range.value);
+})();
+</script>
+
+</body>
+</html>

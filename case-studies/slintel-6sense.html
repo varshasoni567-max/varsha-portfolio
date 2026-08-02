@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The marketing behind Slintel's acquisition by 6sense — Varsha Soni</title>
+<meta name="description" content="How a two-person marketing team took Slintel from $0 to $6M ARR, a $20M Series A, and acquisition by 6sense.">
+<style>
+  :root {
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bg:     #F7F4EC;
+    --ink:    #131210;
+    --pink:   #D69C8C;
+    --card:   #FFFFFF;
+    --muted:  #6B6558;
+    --line:   #131210;
+    --shadow: 5px 5px 0 var(--line);
+    --shadow-sm: 3px 3px 0 var(--line);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  .label {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 13px 22px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--line); }
+  .btn-dark { background: var(--ink); color: var(--bg); }
+  .btn-sm { padding: 9px 16px; font-size: 13px; box-shadow: 2px 2px 0 var(--line); }
+  .btn-sm:hover { box-shadow: 0 0 0 var(--line); }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(247,244,236,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-brand {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-brand .dot { width: 10px; height: 10px; background: var(--pink); border: 2px solid var(--line); border-radius: 3px; display: inline-block; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.75;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  /* ── CASE PAGE ── */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .back-link:hover { color: var(--ink); }
+
+  .cs-header { padding: 40px 0 8px; }
+  .cs-header h1 { font-size: clamp(26px, 4vw, 38px); margin: 14px 0 14px; max-width: 22ch; }
+  .cs-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+  .cs-meta .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); }
+  .cs-meta strong { color: var(--ink); font-family: var(--font-sans); }
+  .cs-intro { font-size: 17px; color: var(--muted); margin-bottom: 8px; }
+
+  section.cs-block { padding: 36px 0; border-top: 2px solid var(--line); }
+  section.cs-block:first-of-type { border-top: none; }
+  .cs-block .label { display: block; margin-bottom: 16px; }
+
+  /* Outcomes grid */
+  .outcome-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+  .outcome-tile {
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 12px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    flex: 0 1 calc((100% - 48px) / 5);
+  }
+  .outcome-num { font-family: var(--font-sans); font-weight: 700; font-size: 19px; color: var(--ink); margin-bottom: 4px; line-height: 1.15; }
+  .outcome-label { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+  /* Body copy */
+  .cs-block p { color: var(--muted); font-size: 15.5px; margin-bottom: 14px; }
+  .cs-block p:last-child { margin-bottom: 0; }
+  .cs-block p a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .cs-block p a:hover { color: var(--pink); }
+
+  /* What I Did — collapsible sub-cards */
+  .did-list { display: flex; flex-direction: column; gap: 12px; }
+  .did-item { border-left: 2px solid var(--pink); padding-left: 18px; }
+  .did-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .did-item summary::-webkit-details-marker { display: none; }
+  .did-item summary::marker { content: ''; }
+  .did-item h3 { font-size: 16px; color: var(--ink); }
+  .did-item summary:hover h3 { color: var(--pink); }
+  .did-item .chev { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); transition: transform 0.15s ease; }
+  .did-item[open] .chev { transform: rotate(180deg); }
+  .did-body { padding: 4px 0 10px; }
+  .did-item p { font-size: 15px; margin-bottom: 8px; }
+  .did-item .assets { font-size: 13px; color: var(--muted); font-style: italic; }
+  .did-item .assets a { color: var(--ink); font-style: normal; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+  /* Press proof + citation lines */
+  .proof-block { margin-top: 16px; }
+  .proof-block-label {
+    display: block;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  .proof-shots { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 12px; }
+  .proof-shot {
+    display: block;
+    width: 230px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .proof-shot:hover { transform: translateY(-3px); box-shadow: 4px 4px 0 var(--pink); }
+  .proof-shot img { display: block; width: 100%; height: 140px; object-fit: cover; object-position: top; }
+  .proof-shot-cap { display: block; font-size: 12px; font-weight: 700; color: var(--ink); padding: 8px 11px; border-top: 2px solid var(--line); }
+  .cite-line { font-size: 14px; color: var(--muted); line-height: 1.65; }
+  .cite-line a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .cite-line a:hover { color: var(--pink); }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; margin-bottom: 22px; }
+  .pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 12.5px;
+    padding: 7px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+  }
+  .pill-link:hover { background: var(--pink); border-color: var(--pink); transform: translateY(-1px); }
+
+  .cat-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+  .cat-toggle[open] { flex: 1 0 100%; }
+  .cat-toggle summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 12.5px;
+    padding: 7px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    cursor: pointer;
+    list-style: none;
+    transition: background 0.12s ease, border-color 0.12s ease;
+  }
+  .cat-toggle summary::-webkit-details-marker { display: none; }
+  .cat-toggle summary::marker { content: ''; }
+  .cat-toggle summary:hover { background: var(--pink); border-color: var(--pink); }
+  .cat-toggle .chev-sm { width: 10px; height: 10px; flex-shrink: 0; transition: transform 0.15s ease; }
+  .cat-toggle[open] .chev-sm { transform: rotate(180deg); }
+  .cat-toggle[open] summary { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .cat-body { width: 100%; margin-top: 10px; margin-bottom: 4px; }
+
+  .proof-shot-full {
+    display: block;
+    margin-top: 16px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .proof-shot-full:hover { transform: translateY(-3px); box-shadow: 4px 4px 0 var(--pink); }
+  .proof-shot-full img { display: block; width: 100%; height: auto; }
+
+  .cs-cta { display: flex; gap: 14px; flex-wrap: wrap; padding-top: 8px; }
+
+  footer {
+    padding: 40px 32px 56px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 760px) {
+    .outcome-tile { flex-basis: calc(50% - 6px); }
+    section.cs-block { padding: 28px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-brand"><span class="dot"></span>Varsha Soni</a>
+    <ul class="nav-links" style="list-style:none;">
+      <li><a href="../index.html#work">Case Studies</a></li>
+      <li><a href="../index.html#ai">AI Tools</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="../cv.html" class="btn btn-sm" target="_blank">CV ↓</a>
+      <a href="mailto:varshasoni567@gmail.com" class="btn btn-sm btn-dark">Get in touch</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── HEADER ── -->
+  <div class="cs-header">
+    <a href="../index.html#work" class="back-link">← All case studies</a>
+    <h1>The marketing behind Slintel's acquisition by 6sense</h1>
+    <div class="cs-meta">
+      <strong>Slintel → 6sense</strong>
+      <span class="dot"></span>
+      <span>Marketing Executive → Product Marketing Manager</span>
+      <span class="dot"></span>
+      <span>Aug 2019 – Mar 2023</span>
+    </div>
+    <p class="cs-intro">One of the first two marketers on the Slintel team who built the inbound engine from $0 to $6M ARR, Series A funding, and acquisition by 6sense.</p>
+  </div>
+
+  <!-- ── OUTCOMES ── -->
+  <section class="cs-block">
+    <span class="label">Outcomes I Drove</span>
+    <div class="outcome-grid">
+      <div class="outcome-tile"><div class="outcome-num">400%</div><div class="outcome-label">Social follower growth (2K to 10K+)</div></div>
+      <div class="outcome-tile"><div class="outcome-num">14% → 30%</div><div class="outcome-label">Newsletter open rate after revamp</div></div>
+      <div class="outcome-tile"><div class="outcome-num">+18%</div><div class="outcome-label">Product adoption after V2 onboarding redesign</div></div>
+      <div class="outcome-tile"><div class="outcome-num">20+</div><div class="outcome-label">Weekly inbound qualified prospects</div></div>
+      <div class="outcome-tile"><div class="outcome-num">9.2/10</div><div class="outcome-label">CSAT</div></div>
+      <div class="outcome-tile"><div class="outcome-num">8 outlets</div><div class="outcome-label">Press coverage for Starter Plan launch</div></div>
+      <div class="outcome-tile"><div class="outcome-num">35+ articles</div><div class="outcome-label">5 long-form, 3 ebooks published</div></div>
+      <div class="outcome-tile"><div class="outcome-num">10 → 130</div><div class="outcome-label">Webinar attendance, peak 42% rate</div></div>
+      <div class="outcome-tile"><div class="outcome-num">23,000+</div><div class="outcome-label">Quora views across 120+ answers</div></div>
+      <div class="outcome-tile"><div class="outcome-num">4.4★, ~100</div><div class="outcome-label">Chrome Extension rating, installs</div></div>
+    </div>
+  </section>
+
+  <!-- ── CONTEXT ── -->
+  <section class="cs-block">
+    <span class="label">Context</span>
+    <p>When I joined Slintel in August 2019 as the first marketing hire, the company was selling through lead lists and founder networks with no content, no email list, and no social presence.</p>
+    <p>The bet was inbound content in a company that had only ever done outbound. Most buyers had never heard of buyer intent data, which meant content could do the educational work before a prospect ever reached sales. Blog, newsletter, social, and a rebuilt knowledge base were built in parallel to feed each other, with paid ads, a Voice of Customer program, and sales feedback loops layered on top.</p>
+    <a class="proof-shot-full" href="https://www.stellarisvp.com/blog/slintels-journey-from-seed-to-exit-in-less-than-3-years" target="_blank" rel="noopener">
+      <img src="images/slintel-stellaris-blog.png" alt="Stellaris VC blog: Slintel's Journey From Seed to Exit in Less Than 3 Years">
+    </a>
+  </section>
+
+  <!-- ── WHAT I DID ── -->
+  <section class="cs-block">
+    <span class="label">What I Did and What It Moved</span>
+    <div class="did-list">
+      <details class="did-item" open>
+        <summary><h3>Lead Generation</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Built organic inbound from scratch through blog content (35+ articles, 5 long-form pieces, 3 ebooks, 8 product videos), LinkedIn and Twitter growth from 2,000 to 10,000+ followers, Quora presence (120+ answers, 23,000+ views, 1+ lead per month), and the free Starter Plan launch. Paired with paid ads using research-backed targeting and a Voice of Customer program that sharpened messaging over time.</p>
+          <p>Managed G2, Capterra, and Chrome Extension store presence, bringing the extension to a 4.4 star rating and 120 installs. Together these channels brought in 20+ qualified prospects per week from zero.</p>
+          <div class="proof-block">
+            <span class="proof-block-label">Press Coverage</span>
+            <div class="proof-shots">
+              <a class="proof-shot" href="https://www.prnewswire.com/news-releases/slintel-releases-free-marketing--sales-intelligence-product-301067094.html" target="_blank" rel="noopener">
+                <img src="images/slintel-press-prnewswire.png" alt="PR Newswire coverage of Slintel's Starter Plan launch" loading="lazy">
+                <span class="proof-shot-cap">PR Newswire ↗</span>
+              </a>
+              <a class="proof-shot" href="https://martechseries.com/sales-marketing/sales-intelligence/slintel-releases-free-marketing-sales-intelligence-product/" target="_blank" rel="noopener">
+                <img src="images/slintel-press-martechseries.png" alt="MarTech Series coverage of Slintel's Starter Plan launch" loading="lazy">
+                <span class="proof-shot-cap">MarTech Series ↗</span>
+              </a>
+            </div>
+            <p class="cite-line">Also covered by:</p>
+            <div class="pill-row">
+              <a class="pill-link" href="https://salestechstar.com/sales-marketing/slintel-releases-free-marketing-sales-intelligence-product/" target="_blank" rel="noopener">SalesTech Star ↗</a>
+              <a class="pill-link" href="https://solutionsreview.com/crm/2020/06/11/slintel-releases-free-sales-and-marketing-product/" target="_blank" rel="noopener">Solutions Review ↗</a>
+              <a class="pill-link" href="https://www.newswire.com/news/slintel-releases-free-marketing-sales-intelligence-product-21148976" target="_blank" rel="noopener">Newswire.com ↗</a>
+              <a class="pill-link" href="https://techcrunch.com/2021/06/10/slintel-scores-20m-series-a-as-buyer-intelligence-tool-gains-traction/" target="_blank" rel="noopener">TechCrunch ↗</a>
+            </div>
+          </div>
+          <div class="proof-block">
+            <span class="proof-block-label">Selected Posts</span>
+            <p class="cite-line">I wrote or ghost-wrote 20 posts during this period, grouped below by category.</p>
+            <div class="cat-row">
+              <details class="cat-toggle">
+                <summary>Biggest B2B Sales Questions (with Anupreet Singh) <svg class="chev-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+                <div class="cat-body">
+                  <p class="cite-line"><a href="https://web.archive.org/web/20200919130919/https://blog.slintel.com/b2b-software-sales-questions-issue-1/" target="_blank" rel="noopener">Issue #1</a>, <a href="https://web.archive.org/web/20200812084212/https://blog.slintel.com/b2b-sales-questions-answered-issue-2/" target="_blank" rel="noopener">Issue #2</a>, <a href="https://web.archive.org/web/20201126093807/https://blog.slintel.com/biggest-b2b-sales-questions-answered-issue-3/" target="_blank" rel="noopener">Issue #3</a>, and <a href="https://web.archive.org/web/20201204201346/https://blog.slintel.com/biggest-b2b-sales-questions-answered-issue-4/" target="_blank" rel="noopener">Issue #4</a>.</p>
+                </div>
+              </details>
+              <details class="cat-toggle">
+                <summary>Prospecting &amp; Technographics <svg class="chev-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+                <div class="cat-body">
+                  <p class="cite-line"><a href="https://web.archive.org/web/20200919122700/https://blog.slintel.com/account-based-prospecting-slintel/" target="_blank" rel="noopener">Account-Based Prospecting with Slintel</a>, <a href="https://web.archive.org/web/20200919114916/https://blog.slintel.com/using-buyer-personas/" target="_blank" rel="noopener">Technographic Buyer Personas</a>, <a href="https://web.archive.org/web/20200919122357/https://blog.slintel.com/find-greenhouse-customers/" target="_blank" rel="noopener">Finding Greenhouse Customers</a>, <a href="https://web.archive.org/web/20200919132017/https://blog.slintel.com/technology-stack-free-tool/" target="_blank" rel="noopener">Analysing Tech Stacks for Leads</a>, <a href="https://web.archive.org/web/20211127150712/https://www.slintel.com/blog/find-company-tech-stack/" target="_blank" rel="noopener">Finding Any Company's Tech Stack</a>, and <a href="https://web.archive.org/web/20201123210956/https://blog.slintel.com/technology-stacks/" target="_blank" rel="noopener">Tech Stacks: More Than Code</a>.</p>
+                </div>
+              </details>
+              <details class="cat-toggle">
+                <summary>Sales Skills &amp; Enablement <svg class="chev-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+                <div class="cat-body">
+                  <p class="cite-line"><a href="https://web.archive.org/web/20201028171331/https://blog.slintel.com/sales-skills-for-sdr/" target="_blank" rel="noopener">SDR Skills</a>, <a href="https://web.archive.org/web/20200809200153/https://blog.slintel.com/optimizing-your-sales-discovery-process/" target="_blank" rel="noopener">Sales Discovery</a>, <a href="https://web.archive.org/web/20201124033708/https://blog.slintel.com/sales-enablement-team-structure/" target="_blank" rel="noopener">Sales Enablement Team Structure</a>, <a href="https://web.archive.org/web/20200922112613/https://blog.slintel.com/11-free-sales-training-resources/" target="_blank" rel="noopener">Free Sales Training Resources</a>, and <a href="https://web.archive.org/web/20201126130535/https://blog.slintel.com/outbound-lead-generation-process/" target="_blank" rel="noopener">Outbound Lead Generation</a>.</p>
+                </div>
+              </details>
+              <details class="cat-toggle">
+                <summary>Sales Culture &amp; Events <svg class="chev-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+                <div class="cat-body">
+                  <p class="cite-line"><a href="https://web.archive.org/web/20201106221137/https://blog.slintel.com/webinar-events-during-covid-19/" target="_blank" rel="noopener">Why Webinars Work So Well</a>, <a href="https://web.archive.org/web/20201216112836/https://blog.slintel.com/365-sales-quotess/" target="_blank" rel="noopener">Motivational Sales Quotes</a>, <a href="https://web.archive.org/web/20201206211030/https://blog.slintel.com/71-sales-statistics/" target="_blank" rel="noopener">Sales Statistics</a>, <a href="https://web.archive.org/web/20201124231812/https://blog.slintel.com/5-movies-about-sales-you-need-to-watch-today/" target="_blank" rel="noopener">Sales Movies</a>, and <a href="https://web.archive.org/web/20200919121938/https://blog.slintel.com/dreamforce-2019-guide/" target="_blank" rel="noopener">Surviving Dreamforce '19</a>.</p>
+                </div>
+              </details>
+            </div>
+          </div>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>Product Adoption</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Ran two newsletters throughout my tenure: a category education newsletter covering technographics and field stories, and a weekly product newsletter I maintained for over a year. Revamping the first grew open rates from 14% to 30%. Ran adoption webinars for existing customers with attendance ranging from 10 to 130 and a peak rate of 42%. Led the V2 onboarding redesign using Appcues, which drove an 18% lift in product activation.</p>
+          <div class="proof-block">
+            <span class="proof-block-label">Newsletter Issues</span>
+            <div class="proof-shots">
+              <a class="proof-shot" href="assets/slintel-newsletter-slintelegram.pdf" target="_blank" rel="noopener">
+                <img src="images/slintel-newsletter-slintelegram.png" alt="Slintelegram newsletter — Halloween edition, ClickUp funding and industry news" loading="lazy">
+                <span class="proof-shot-cap">Slintelegram ↗</span>
+              </a>
+              <a class="proof-shot" href="assets/slintel-newsletter-weeklydigest.pdf" target="_blank" rel="noopener">
+                <img src="images/slintel-newsletter-weeklydigest.png" alt="Weekly Digest newsletter — Bethesda acquisition and Amwell IPO roundup" loading="lazy">
+                <span class="proof-shot-cap">Weekly Digest ↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>Sales Enablement</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Built battlecards, talk tracks, one-pagers, decks, and case studies covering every major use case and buyer scenario, iterated continuously through call listening and sales feedback. The result was reps spending less time educating and more time closing, with an asset ready for every objection or scenario a prospect raised. Wrote or edited 10 of the 25 customer case studies on the website, used directly in sales cycles as proof without needing to be on the call.</p>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>Sales Pipeline and Podcast</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Supported Rambling Sessions, a LinkedIn sales podcast with Anupreet Singh, for 4 months — handling setup, research, and post-episode nurture campaigns. Generated 3 to 4 leads per session with roughly one conversion per month. Also built and ran an outreach campaign to external sales podcasts and publications from a curated list, driving followers and media relationships.</p>
+          <div class="proof-block">
+            <span class="proof-block-label">Rambling Sessions (videos since deleted along with Slintel's YouTube)</span>
+            <div class="proof-shots">
+              <a class="proof-shot" href="https://www.linkedin.com/pulse/top-10-rambling-sessions-moments-anupreet-singh/" target="_blank" rel="noopener">
+                <img src="images/slintel-rambling-top10.png" alt="Top 10 Moments from our Rambling Sessions" loading="lazy">
+                <span class="proof-shot-cap">Top 10 Rambling Sessions Moments ↗</span>
+              </a>
+              <a class="proof-shot" href="https://www.linkedin.com/pulse/learnings-from-rambling-session-b2b-sales-webinar-1-anupreet-singh/" target="_blank" rel="noopener">
+                <img src="images/slintel-rambling-webinar1.png" alt="Learnings from Rambling Session: B2B Sales Webinar #1, by Anupreet Singh" loading="lazy">
+                <span class="proof-shot-cap">Learnings from Rambling Session #1 ↗</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>Knowledge Base</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Rebuilt the entire knowledge base from scratch, setting a process and framework that could be handed off and scaled. It reduced repetitive CS questions, fed onboarding and product tours, and became source material for blog content.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ── WHAT IT ADDED UP TO ── -->
+  <section class="cs-block">
+    <span class="label">What It Added Up To</span>
+    <p>Slintel went from no marketing function to a full inbound engine in under two years. Revenue grew 5x in 12 months. The company raised a $20M Series A from GGV Capital, and four months later was acquired by 6sense. The <a href="https://www.stellarisvp.com/blog/slintels-journey-from-seed-to-exit-in-less-than-3-years" target="_blank" rel="noopener">Stellaris blog</a> credited the shift from outbound to inbound with delivering higher scalability and capital efficiency. That shift was built one channel, one asset, and one feedback loop at a time.</p>
+    <p>I joined as a generalist and left as a product marketer because I had spent three years getting closer to the customer, the product, and the sales process than anyone else on the team. That depth was the real outcome.</p>
+  </section>
+
+  <div class="cs-cta">
+    <a href="../index.html#work" class="btn btn-dark">← Back to case studies</a>
+    <a href="mailto:varshasoni567@gmail.com" class="btn">Get in touch</a>
+  </div>
+
+</div>
+
+<footer>© 2026 Varsha Soni · Built with Claude</footer>
+
+</body>
+</html>

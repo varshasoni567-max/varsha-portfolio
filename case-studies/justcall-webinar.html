@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The launch system behind 30+ GTM releases at JustCall · Varsha Soni</title>
+<meta name="description" content="How I built a tiered GTM launch system at JustCall to ship 30+ product releases on schedule, including the AI Voice Agent launch that reached $1M ARR within a year.">
+<style>
+  :root {
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bg:     #F7F4EC;
+    --ink:    #131210;
+    --pink:   #D69C8C;
+    --card:   #FFFFFF;
+    --muted:  #6B6558;
+    --line:   #131210;
+    --shadow: 5px 5px 0 var(--line);
+    --shadow-sm: 3px 3px 0 var(--line);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  .label {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 13px 22px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--line); }
+  .btn-dark { background: var(--ink); color: var(--bg); }
+  .btn-sm { padding: 9px 16px; font-size: 13px; box-shadow: 2px 2px 0 var(--line); }
+  .btn-sm:hover { box-shadow: 0 0 0 var(--line); }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(247,244,236,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-brand {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-brand .dot { width: 10px; height: 10px; background: var(--pink); border: 2px solid var(--line); border-radius: 3px; display: inline-block; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.75;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+  }
+
+  /* ── CASE PAGE ── */
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .back-link:hover { color: var(--ink); }
+
+  .cs-header { padding: 40px 0 8px; }
+  .cs-header h1 { font-size: clamp(26px, 4vw, 38px); margin: 14px 0 14px; max-width: 24ch; }
+  .cs-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 13.5px; color: var(--muted); margin-bottom: 18px; }
+  .cs-meta .dot { width: 4px; height: 4px; border-radius: 50%; background: var(--muted); }
+  .cs-meta strong { color: var(--ink); font-family: var(--font-sans); }
+  .cs-intro { font-size: 17px; color: var(--muted); margin-bottom: 8px; }
+
+  section.cs-block { padding: 36px 0; border-top: 2px solid var(--line); }
+  section.cs-block:first-of-type { border-top: none; }
+  .cs-block .label { display: block; margin-bottom: 16px; }
+
+  /* Outcomes grid */
+  .outcome-grid { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 12px; }
+  .outcome-tile {
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 14px 12px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    flex: 0 1 calc((100% - 48px) / 5);
+  }
+  .outcome-num { font-family: var(--font-sans); font-weight: 700; font-size: 19px; color: var(--ink); margin-bottom: 4px; line-height: 1.15; }
+  .outcome-label { font-size: 12px; color: var(--muted); line-height: 1.35; }
+
+  /* Body copy */
+  .cs-block p { color: var(--muted); font-size: 15.5px; margin-bottom: 14px; }
+  .cs-block p:last-child { margin-bottom: 0; }
+
+  /* What I Did — collapsible sub-cards */
+  .did-list { display: flex; flex-direction: column; gap: 12px; }
+  .did-item { border-left: 2px solid var(--pink); padding-left: 18px; }
+  .did-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 6px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+  .did-item summary::-webkit-details-marker { display: none; }
+  .did-item summary::marker { content: ''; }
+  .did-item h3 { font-size: 16px; color: var(--ink); }
+  .did-item summary:hover h3 { color: var(--pink); }
+  .did-item .chev { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); transition: transform 0.15s ease; }
+  .did-item[open] .chev { transform: rotate(180deg); }
+  .did-body { padding: 4px 0 10px; }
+  .did-item p { font-size: 15px; margin-bottom: 8px; }
+  .did-item .assets { font-size: 13px; color: var(--muted); font-style: italic; }
+  .did-item .assets a { color: var(--ink); font-style: normal; font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+
+  .did-body ul { list-style: none; margin: 2px 0 10px; display: flex; flex-direction: column; gap: 10px; }
+  .did-body ul li { font-size: 15px; color: var(--muted); position: relative; padding-left: 16px; }
+  .did-body ul li::before { content: '•'; position: absolute; left: 0; color: var(--pink); }
+  .did-body ul li strong { color: var(--ink); }
+
+  .tier-grid { display: flex; flex-wrap: wrap; gap: 10px; margin: 2px 0 16px; }
+  .tier-card {
+    flex: 1 1 calc(25% - 8px);
+    min-width: 130px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    padding: 12px 13px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+  }
+  .tier-name { display: block; font-family: var(--font-sans); font-weight: 700; font-size: 13px; color: var(--ink); margin-bottom: 6px; }
+  .tier-desc { font-size: 12.5px; color: var(--muted); line-height: 1.45; }
+
+  @media (max-width: 760px) {
+    .tier-card { flex-basis: calc(50% - 5px); }
+  }
+
+  .cite-line { font-size: 14px; color: var(--muted); line-height: 1.65; margin-top: 10px; }
+  .cite-line a { color: var(--ink); font-weight: 600; text-decoration: underline; text-underline-offset: 2px; }
+  .cite-line a:hover { color: var(--pink); }
+
+  .proof-block { margin-top: 10px; }
+  .proof-shots { display: flex; flex-wrap: wrap; gap: 14px; margin-bottom: 4px; }
+  .proof-shot {
+    display: block;
+    width: 230px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .proof-shot:hover { transform: translateY(-3px); box-shadow: 4px 4px 0 var(--pink); }
+  .proof-shot img { display: block; width: 100%; height: 140px; object-fit: cover; object-position: top; }
+  .proof-shot-cap { display: block; font-size: 12px; font-weight: 700; color: var(--ink); padding: 8px 11px; border-top: 2px solid var(--line); }
+
+  .pill-row { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 10px; }
+  .pill-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: 12.5px;
+    padding: 7px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--card);
+    color: var(--ink);
+    transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+  }
+  .pill-link:hover { background: var(--pink); border-color: var(--pink); transform: translateY(-1px); }
+
+  /* Before/after slider */
+  .ba-slider { width: 90%; margin: 14px auto -22px; }
+  .ba-compare {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1344 / 860;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+  }
+  .ba-compare .ba-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+  }
+  .ba-compare .ba-before { clip-path: inset(0 50% 0 0); }
+  .ba-handle-line { position: absolute; top: 0; bottom: 0; left: 50%; width: 2px; background: var(--card); box-shadow: 0 0 0 1px var(--line); pointer-events: none; }
+  .ba-handle-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 2px solid var(--line);
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+    color: var(--ink);
+    pointer-events: none;
+  }
+  .ba-tag {
+    position: absolute;
+    top: 10px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--card);
+    pointer-events: none;
+  }
+  .ba-tag-before { left: 10px; }
+  .ba-tag-after { right: 10px; }
+  .ba-range {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: ew-resize;
+    -webkit-appearance: none;
+  }
+  .ba-caption { display: flex; justify-content: center; margin-top: 18px; }
+
+  .tag-line { font-size: 13.5px; color: var(--muted); margin-top: 16px; }
+  .tag-line a { color: var(--ink); font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+  .tag-line .sep { color: var(--pink); margin: 0 6px; }
+
+  .cs-cta { display: flex; gap: 14px; flex-wrap: wrap; padding-top: 8px; }
+
+  footer {
+    padding: 40px 32px 56px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 760px) {
+    .outcome-tile { flex-basis: calc(50% - 6px); }
+    section.cs-block { padding: 28px 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="../index.html" class="nav-brand"><span class="dot"></span>Varsha Soni</a>
+    <ul class="nav-links" style="list-style:none;">
+      <li><a href="../index.html#work">Case Studies</a></li>
+      <li><a href="../index.html#ai">AI Tools</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="../cv.html" class="btn btn-sm" target="_blank">CV ↓</a>
+      <a href="mailto:varshasoni567@gmail.com" class="btn btn-sm btn-dark">Get in touch</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <!-- ── HEADER ── -->
+  <div class="cs-header">
+    <a href="../index.html#work" class="back-link">← All case studies</a>
+    <h1>The launch system behind 30+ GTM releases at JustCall</h1>
+    <div class="cs-meta">
+      <strong>JustCall</strong>
+      <span class="dot"></span>
+      <span>Product Marketing Manager</span>
+      <span class="dot"></span>
+      <span>Dec 2024 – Feb 2026</span>
+    </div>
+    <p class="cs-intro">JustCall shipped a new AI feature every two weeks during its pivot from VoIP to AI-first sales automation. I built the tiered launch system that kept 30+ releases on schedule, then used it to launch AI Voice Agent to $1M ARR within a year.</p>
+  </div>
+
+  <!-- ── OUTCOMES ── -->
+  <section class="cs-block">
+    <span class="label">Outcomes I Drove</span>
+    <div class="outcome-grid">
+      <div class="outcome-tile"><div class="outcome-num">$1M ARR</div><div class="outcome-label">AI Voice Agent revenue within first year</div></div>
+      <div class="outcome-tile"><div class="outcome-num">27</div><div class="outcome-label">Launches run through the tier system across 11 months</div></div>
+      <div class="outcome-tile"><div class="outcome-num">29</div><div class="outcome-label">Demo bookings from a single AI Voice Agent webinar follow-up sequence</div></div>
+      <div class="outcome-tile"><div class="outcome-num">43%</div><div class="outcome-label">Product newsletter open rate, ~2x the B2B SaaS average</div></div>
+      <div class="outcome-tile"><div class="outcome-num">#19</div><div class="outcome-label">Product Hunt ranking for the AI SDR launch</div></div>
+    </div>
+  </section>
+
+  <!-- ── CONTEXT ── -->
+  <section class="cs-block">
+    <span class="label">Context</span>
+    <p>JustCall is a cloud calling and SMS platform backed by Sequoia, serving 6,000+ customers across 40+ countries. When I joined in December 2024, the company was mid-pivot from a recognised VoIP tool to an AI-first sales automation platform, shipping a new feature every two weeks.</p>
+    <p>That pace was the real problem. A launch cadence that fast breaks any GTM process built for occasional releases: pages go up without positioning, reps get blindsided on live calls, nobody can say afterward if a launch worked. The fix was a system that scoped every release before GTM work began, so the right assets shipped on time, every time.</p>
+    <div class="ba-slider">
+      <div class="ba-compare" id="jc-ba">
+        <img class="ba-img" src="images/justcall-updates-after.png" alt="justcall.io/updates after the redesign">
+        <img class="ba-img ba-before" id="jc-ba-before" src="images/justcall-updates-before.png" alt="justcall.io/updates before the redesign">
+        <div class="ba-handle-line" id="jc-ba-line"></div>
+        <div class="ba-handle-btn" id="jc-ba-btn">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 7 3 12 8 17"/><polyline points="16 7 21 12 16 17"/></svg>
+        </div>
+        <span class="ba-tag ba-tag-before">Before</span>
+        <span class="ba-tag ba-tag-after">After</span>
+        <input type="range" class="ba-range" id="jc-ba-range" min="0" max="100" value="50" aria-label="Drag to compare the updates page before and after the redesign">
+      </div>
+      <p class="ba-caption"><a class="pill-link" href="https://justcall.io/updates/" target="_blank" rel="noopener">Before and after redesign of the product updates page ↗</a></p>
+    </div>
+  </section>
+
+  <!-- ── WHAT I DID ── -->
+  <section class="cs-block">
+    <span class="label">What I Did and What It Moved</span>
+    <div class="did-list">
+      <details class="did-item" open>
+        <summary><h3>The Launch System</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Every release got a tier (T0 to T3) before any GTM work began. The tier set the required docs, the assets, and whether tracking and a post-launch review were mandatory.</p>
+          <div class="tier-grid">
+            <div class="tier-card">
+              <span class="tier-name">T0 · Flagship</span>
+              <span class="tier-desc">Full GTM stack. Mandatory tracking, post-launch review.</span>
+            </div>
+            <div class="tier-card">
+              <span class="tier-name">T1 · Adoption-led</span>
+              <span class="tier-desc">Targeted messaging. Tracking and an adoption metric required.</span>
+            </div>
+            <div class="tier-card">
+              <span class="tier-name">T2 · Incremental</span>
+              <span class="tier-desc">Light enablement. Tracking optional.</span>
+            </div>
+            <div class="tier-card">
+              <span class="tier-name">T3 · Infra &amp; compliance</span>
+              <span class="tier-desc">Customer comms only. No tracking.</span>
+            </div>
+          </div>
+          <p>Ran 27 launches through the system between January and November 2025: 2 flagship (T0), 8 adoption-led (T1), 13 incremental (T2), 4 compliance (T3). Workflows grew 2x to 400+ active workflows across 300+ accounts within a month. Unified Analytics Dashboard went from near-zero to 26,000 weekly events in two weeks. The AI SDR Product Hunt launch hit #19.</p>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>AI Voice Agent Launch</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>AI Voice Agent was the system's highest-stakes test. Competitors pitched "replace your SDR team"; I positioned it as amplification instead, AI handles volume, reps handle judgment.</p>
+          <ul>
+            <li>
+              <strong>Page suite.</strong> Built the AI Voice Agent hub plus AI SDR, AI Calling Agent, AI Concierge, and multilingual support subpages, each built around outcomes and industry use cases (real estate, healthcare, solar) instead of feature lists.
+              <div class="proof-block">
+                <div class="proof-shots">
+                  <a class="proof-shot" href="https://justcall.io/product/ai-voice-agent/" target="_blank" rel="noopener">
+                    <img src="images/justcall-web-aivoiceagent.jpg" alt="JustCall AI Voice Agent hub page" loading="lazy">
+                    <span class="proof-shot-cap">AI Voice Agent Hub ↗</span>
+                  </a>
+                  <a class="proof-shot" href="https://justcall.io/product/ai-voice-agent/ai-sdr/" target="_blank" rel="noopener">
+                    <img src="images/justcall-web-aisdr.jpg" alt="JustCall AI SDR product page" loading="lazy">
+                    <span class="proof-shot-cap">AI SDR ↗</span>
+                  </a>
+                </div>
+                <p class="cite-line">Full page suite:</p>
+                <div class="pill-row">
+                  <a class="pill-link" href="https://justcall.io/product/ai-voice-agent/" target="_blank" rel="noopener">AI Voice Agent Hub ↗</a>
+                  <a class="pill-link" href="https://justcall.io/product/ai-voice-agent/ai-sdr/" target="_blank" rel="noopener">AI SDR ↗</a>
+                  <a class="pill-link" href="https://justcall.io/product/ai-voice-agent/ai-calling-agent/" target="_blank" rel="noopener">AI Calling Agent ↗</a>
+                  <a class="pill-link" href="https://justcall.io/product/ai-voice-agent/ai-concierge/" target="_blank" rel="noopener">AI Concierge ↗</a>
+                  <a class="pill-link" href="https://justcall.io/product/ai-voice-agent/multilingual-support/" target="_blank" rel="noopener">Multilingual Support ↗</a>
+                </div>
+              </div>
+            </li>
+            <li><strong>Launch webinar.</strong> Ran it end to end: concept, promotion, live demo, follow-up. 200+ registrations, 125 live attendees (62% show rate vs. ~40% industry average), and a 3-email follow-up sequence that converted 29 demo bookings in 72 hours.</li>
+            <li><strong>Result. AI Voice Agent reached $1M ARR within its first year, JustCall's highest-margin product and the centerpiece of its AI platform narrative.</strong></li>
+          </ul>
+        </div>
+      </details>
+      <details class="did-item">
+        <summary><h3>Owned Channels: Newsletter &amp; Product Updates</h3><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></summary>
+        <div class="did-body">
+          <p>Two channels ran continuously underneath every launch, not tied to any single release.</p>
+          <ul>
+            <li><strong>Product newsletter.</strong> Owned it from February 2025 across customer, channel partner, and tech partner audiences: 43% open rate, 2.3% CTR (roughly 2x the B2B SaaS average), 6,000+ subscribers growing 200 to 400/month. One story per issue, no padding: every issue answered "what does this mean for me" first.</li>
+            <li>
+              <strong>Product updates page.</strong> Identified the need and independently led the redesign of justcall.io/updates: new format, standardised messaging and image system, repeatable publishing process from day one of every release. Became the internal standard for product communication.
+              <div class="pill-row">
+                <a class="pill-link" href="https://justcall.io/updates/" target="_blank" rel="noopener">Product Updates ↗</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ── WHAT IT ADDED UP TO ── -->
+  <section class="cs-block">
+    <span class="label">What It Added Up To</span>
+    <p>27 launches shipped on schedule across 11 months, each scoped to a tier before work began. That discipline let AI Voice Agent, the pivot's highest-stakes release, launch with a clear position and a webinar format that converted, reaching $1M ARR within a year. The newsletter and updates page outlasted any single launch, becoming durable channels the system could lean on. None of it was one-off: it was a system, and it got more reliable with every release.</p>
+    <p class="tag-line"><a href="https://justcall.io/product/ai-voice-agent/" target="_blank" rel="noopener">AI Voice Agent</a><span class="sep">·</span><a href="https://justcall.io/updates/" target="_blank" rel="noopener">Product Updates</a><span class="sep">·</span><a href="https://www.producthunt.com/products/justcall-ai-sdr" target="_blank" rel="noopener">AI SDR on Product Hunt</a></p>
+  </section>
+
+  <div class="cs-cta">
+    <a href="../index.html#work" class="btn btn-dark">← Back to case studies</a>
+    <a href="mailto:varshasoni567@gmail.com" class="btn">Get in touch</a>
+  </div>
+
+</div>
+
+<footer>© 2026 Varsha Soni · Built with Claude</footer>
+
+<script>
+(function () {
+  var range = document.getElementById('jc-ba-range');
+  var before = document.getElementById('jc-ba-before');
+  var line = document.getElementById('jc-ba-line');
+  var btn = document.getElementById('jc-ba-btn');
+  if (!range) return;
+  function update(v) {
+    before.style.clipPath = 'inset(0 ' + (100 - v) + '% 0 0)';
+    line.style.left = v + '%';
+    btn.style.left = v + '%';
+  }
+  range.addEventListener('input', function () { update(this.value); });
+  update(range.value);
+})();
+</script>
+
+</body>
+</html>
