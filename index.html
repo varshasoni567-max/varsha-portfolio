@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Varsha Soni — Senior Product Marketing Manager</title>
+<meta name="description" content="Senior PMM with 7 years at early-stage B2B SaaS companies, usually the first or founding PMM in the room. Positioning, GTM strategy, and AI-powered product marketing.">
+<style>
+  :root {
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bg:     #F7F4EC;
+    --ink:    #131210;
+    --pink:   #D69C8C;
+    --card:   #FFFFFF;
+    --muted:  #6B6558;
+    --line:   #131210;
+    --shadow: 5px 5px 0 var(--line);
+    --shadow-sm: 3px 3px 0 var(--line);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  .label {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 13px 22px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--line); }
+  .btn-dark { background: var(--ink); color: var(--bg); }
+  .btn-pink { background: var(--pink); color: var(--ink); }
+  .btn-sm { padding: 9px 16px; font-size: 13px; box-shadow: 2px 2px 0 var(--line); }
+  .btn-sm:hover { box-shadow: 0 0 0 var(--line); }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(247,244,236,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-brand {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-brand .dot { width: 10px; height: 10px; background: var(--pink); border: 2px solid var(--line); border-radius: 3px; display: inline-block; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.75;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+
+  /* ── HERO ── */
+  .hero { padding: 76px 0 48px; }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 56px;
+    align-items: center;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 3.6vw, 46px);
+    max-width: 17ch;
+    color: var(--ink);
+  }
+  .hero-sub {
+    margin-top: 24px;
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 56ch;
+    line-height: 1.6;
+  }
+  .hero-cta { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+
+  .hero-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 40px;
+    padding-top: 28px;
+    border-top: 2px solid var(--line);
+    max-width: 460px;
+  }
+  .hero-stat strong {
+    font-family: var(--font-sans);
+    font-size: 26px;
+    display: block;
+  }
+  .hero-stat span {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    display: block;
+  }
+
+  .hero-photo-wrap { display: flex; flex-direction: column; align-items: center; gap: 14px; }
+  .hero-photo {
+    width: 100%;
+    max-width: 352px;
+    border: 2px solid var(--line);
+    border-radius: 20px;
+    background: var(--card);
+    box-shadow: var(--shadow);
+    padding: 14px;
+  }
+  .hero-photo img { width: 100%; display: block; border-radius: 12px; }
+  .hero-photo-caption {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .hero-photo-wrap { order: -1; }
+    .hero-photo { max-width: 242px; }
+  }
+
+  /* ── SECTION SHELL ── */
+  section.block { padding: 108px 0; }
+  #ai.block { padding: 0 0 56px; }
+  #contact.block { padding: 56px 0; }
+  .sec-head { text-align: center; margin-bottom: 56px; }
+  .sec-head .label { display: block; margin-bottom: 14px; }
+  .sec-head h2 { font-size: clamp(30px, 4.4vw, 46px); }
+  .sec-head p { color: var(--muted); font-size: 17px; max-width: 52ch; margin: 16px auto 0; }
+  #ai .sec-head { margin-bottom: 12px; }
+
+  /* ── CASE STUDIES ── */
+  .case-section { background: var(--ink); border-radius: 22px; margin: 0 24px; }
+  .case-section .wrap { padding: 64px 32px; }
+  .case-section .sec-head { margin-bottom: 64px; }
+  .case-section .sec-head .label { color: #A8A296; }
+  .case-section .sec-head h2 { color: var(--bg); }
+  .case-section .sec-head p { color: #B8B2A5; max-width: none; white-space: nowrap; }
+  .work-pin-outer { position: relative; }
+  .work-pin-inner { position: sticky; top: 0; }
+  .case-scroll {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin: 0 -32px;
+    padding-left: 32px;
+    padding-right: 32px;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .case-scroll::-webkit-scrollbar { display: none; }
+  .case-card {
+    position: relative;
+    flex: 0 0 calc((100% - 64px - 40px) / 2.3);
+    display: flex;
+    flex-direction: column;
+    background: #1F1D19;
+    border: 2px solid #3A362E;
+    border-radius: 16px;
+    padding: 22px 20px;
+    transition: border-color 0.12s ease, transform 0.12s ease;
+  }
+  .case-card:hover { border-color: var(--pink); }
+  .case-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+  .case-co { font-family: var(--font-sans); font-weight: 700; font-size: 14px; color: var(--bg); }
+  .case-tenure { font-size: 13px; color: #B8B2A5; }
+  .case-dot { width: 4px; height: 4px; border-radius: 50%; background: #8A8378; }
+  .case-title { font-size: clamp(17px, 2vw, 20px); margin-bottom: 10px; color: var(--bg); }
+  .case-desc { color: #B8B2A5; font-size: 14px; margin-bottom: 16px; }
+  .case-block {
+    border-left: 2px solid var(--pink);
+    padding-left: 14px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .case-block-label {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 10.5px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #8A8378;
+  }
+  .case-metrics { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+  .case-metrics li { color: #B8B2A5; font-size: 13.5px; line-height: 1.5; position: relative; padding-left: 15px; }
+  .case-metrics li::before { content: '•'; position: absolute; left: 0; color: var(--pink); }
+  .case-card:hover .case-title { color: var(--pink); }
+  .case-cta-row { display: flex; justify-content: flex-end; margin-top: auto; }
+  .case-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12.5px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--bg);
+    background: #1F1D19;
+    border: 2px solid var(--pink);
+    border-radius: 8px;
+    padding: 11px 18px;
+    box-shadow: 3px 3px 0 var(--pink);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .case-cta:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--pink); }
+
+  /* ── AI SECTION ── */
+  .ai-list { border-top: 2px solid var(--line); margin-top: 8px; }
+  .ai-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 16px 4px;
+    border-bottom: 2px solid var(--line);
+    transition: background 0.12s ease;
+  }
+  .ai-row:hover { background: rgba(214,156,140,0.14); }
+  .ai-row-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pink);
+    border: 2px solid var(--line);
+    border-radius: 10px;
+  }
+  .ai-row-icon svg { width: 20px; height: 20px; }
+  .ai-row-text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ai-row-text strong { font-family: var(--font-sans); font-weight: 700; font-size: 17px; }
+  .ai-row-text span { color: var(--muted); font-size: 14px; }
+  .ai-row-arrow { font-weight: 700; font-size: 18px; color: var(--pink); transition: transform 0.12s ease; flex-shrink: 0; }
+  .ai-row:hover .ai-row-arrow { transform: translateX(4px); }
+  .ai-body + .ai-body { margin-top: -32px; }
+  .ai-body {
+    max-width: 900px;
+    margin: 0 auto 48px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 17px;
+  }
+
+  /* ── CONTACT ── */
+  #contact .wrap { text-align: center; }
+  #contact h2 { font-size: clamp(34px, 5.2vw, 58px); margin-bottom: 18px; }
+  #contact p { color: var(--muted); font-size: 17px; margin-bottom: 34px; }
+  .contact-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+
+  footer {
+    padding: 40px 32px 56px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+    .hero { padding: 52px 0 36px; }
+    section.block { padding: 72px 0; }
+    .case-section .sec-head p { white-space: normal; max-width: 52ch; }
+    .case-scroll { margin: 0 -22px; padding-left: 22px; padding-right: 22px; }
+    .case-card { flex-basis: 85%; padding: 20px 18px; }
+    .ai-row { flex-wrap: wrap; }
+    .case-section { margin: 0 14px; }
+    .case-section .wrap { padding: 44px 22px; }
+    .case-section .sec-head { margin-bottom: 44px; }
+    .hero-stats { grid-template-columns: repeat(2, 1fr); max-width: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand"><span class="dot"></span>Varsha Soni</a>
+    <ul class="nav-links" style="list-style:none;">
+      <li><a href="#work">Case Studies</a></li>
+      <li><a href="#ai">AI Tools</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="cv.html" class="btn btn-sm" target="_blank">CV ↓</a>
+      <a href="mailto:varshasoni567@gmail.com" class="btn btn-sm btn-dark">Get in touch</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO / INTRO ── -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-grid">
+      <div>
+        <h1>I turn early-stage B2B SaaS products into GTM that scales.</h1>
+        <p class="hero-sub">Hi, I'm Varsha. A Senior Product Marketing Manager with 7 years in B2B SaaS, usually the first or founding PMM in the room. I do the fundamentals well: positioning, launches, and content systems that compound, built and shipped end-to-end, not just planned.</p>
+        <div class="hero-cta">
+          <a href="#work" class="btn btn-dark">See the case studies →</a>
+          <a href="mailto:varshasoni567@gmail.com" class="btn">Get in touch</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>5x</strong><span>ARR in 12 months</span></div>
+          <div class="hero-stat"><strong>$20M</strong><span>Series A raised</span></div>
+          <div class="hero-stat"><strong>1</strong><span>Acquisition (6sense)</span></div>
+          <div class="hero-stat"><strong>7 yrs</strong><span>B2B SaaS PMM</span></div>
+        </div>
+      </div>
+      <div class="hero-photo-wrap">
+        <div class="hero-photo"><img src="images/varsha.png" alt="Varsha Soni"></div>
+        <div class="hero-photo-caption">Senior PMM · B2B SaaS</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CASE STUDIES ── -->
+<section id="work" class="block work-pin-outer">
+  <div class="work-pin-inner">
+  <div class="case-section">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="label">— Case Studies —</span>
+      <h2>Work that moved numbers.</h2>
+      <p>Four roles, one pattern: walk in early and build the GTM engine from scratch.</p>
+    </div>
+
+    <div class="case-scroll">
+      <div class="case-card">
+        <div class="case-meta"><span class="case-co">Slintel → 6sense</span><span class="case-dot"></span><span class="case-tenure">Aug 2019 – Mar 2023</span></div>
+        <h3 class="case-title">Slintel's Inbound Engine</h3>
+        <p class="case-desc">One of the first two marketers at Slintel, growing into the PMM role while building the inbound engine from scratch.</p>
+        <div class="case-block">
+          <span class="case-block-label">Result</span>
+          <ul class="case-metrics">
+            <li>5x revenue growth, 12 months</li>
+            <li>$20M Series A raised</li>
+            <li>Acquired by 6sense</li>
+          </ul>
+        </div>
+        <div class="case-cta-row"><a href="case-studies/slintel-6sense.html" class="case-cta">Read the case study →</a></div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-meta"><span class="case-co">Fincent</span><span class="case-dot"></span><span class="case-tenure">Mar 2023 – Apr 2024</span></div>
+        <h3 class="case-title">Building Fincent's Product Marketing</h3>
+        <p class="case-desc">Built Fincent's product marketing function from scratch: web infrastructure, iOS launch, SEO content, and a scalable demo program.</p>
+        <div class="case-block">
+          <span class="case-block-label">Result</span>
+          <ul class="case-metrics">
+            <li>iOS downloads grew 2.5x</li>
+            <li>12.5% demo-to-close rate</li>
+            <li>6 feature pages, 3 competitor pages</li>
+          </ul>
+        </div>
+        <div class="case-cta-row"><a href="case-studies/fincent-ios-launch.html" class="case-cta">Read the case study →</a></div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-meta"><span class="case-co">JustCall</span><span class="case-dot"></span><span class="case-tenure">Dec 2024 – Feb 2026</span></div>
+        <h3 class="case-title">The JustCall Launch System</h3>
+        <p class="case-desc">Built the tiered launch system behind 30+ GTM releases at JustCall, then used it to launch the flagship AI Voice Agent to $1M ARR.</p>
+        <div class="case-block">
+          <span class="case-block-label">Result</span>
+          <ul class="case-metrics">
+            <li>27 launches, 11 months</li>
+            <li>AI Voice Agent: $1M ARR</li>
+            <li>43% newsletter open rate</li>
+          </ul>
+        </div>
+        <div class="case-cta-row"><a href="case-studies/justcall-webinar.html" class="case-cta">Read the case study →</a></div>
+      </div>
+
+      <div class="case-card">
+        <div class="case-meta"><span class="case-co">JustCall</span><span class="case-dot"></span><span class="case-tenure">Dec 2024 – Feb 2026</span></div>
+        <h3 class="case-title">Integrations Into a Signup Channel</h3>
+        <p class="case-desc">Rebuilt JustCall's flagship integration page around a control-tested structure, then made it the template for the rest of the directory.</p>
+        <div class="case-block">
+          <span class="case-block-label">Result</span>
+          <ul class="case-metrics">
+            <li>HubSpot rebuild: +48% signups</li>
+            <li>309 signups, 123 demos</li>
+            <li>23 of 70+ pages revamped</li>
+          </ul>
+        </div>
+        <div class="case-cta-row"><a href="case-studies/justcall-integrations.html" class="case-cta">Read the case study →</a></div>
+      </div>
+    </div>
+  </div>
+  </div>
+  </div>
+</section>
+
+<!-- ── HOW I USE AI ── -->
+<section id="ai" class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="label">— How I Use AI —</span>
+      <h2>Where AI Actually Helps</h2>
+    </div>
+    <p class="ai-body">I'm proficient with AI tools generally, and I use them to build artefacts, live tools, and prototypes that actually work:<br>things that take load off other teams, and cut down on busywork.</p>
+    <p class="ai-body">Below are a few tools I've built.</p>
+    <div class="ai-list">
+      <a href="https://headline-analyzer-ten.vercel.app/" target="_blank" rel="noopener" class="ai-row">
+        <span class="ai-row-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 17a8 8 0 1 1 16 0"/>
+            <path d="M12 13l4-4"/>
+            <circle cx="12" cy="13" r="1.1" fill="var(--ink)" stroke="none"/>
+          </svg>
+        </span>
+        <span class="ai-row-text"><strong>Headline Analyzer</strong><span>Score your headline for power, emotion, length, and readability.</span></span>
+        <span class="ai-row-arrow">→</span>
+      </a>
+      <a href="https://positioning-builder-tool.vercel.app/" target="_blank" rel="noopener" class="ai-row">
+        <span class="ai-row-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="8"/>
+            <circle cx="12" cy="12" r="4.3"/>
+            <circle cx="12" cy="12" r="1.1" fill="var(--ink)" stroke="none"/>
+          </svg>
+        </span>
+        <span class="ai-row-text"><strong>Positioning Builder</strong><span>Turn a few plain-language answers into ready-to-use positioning.</span></span>
+        <span class="ai-row-arrow">→</span>
+      </a>
+      <a href="https://bullet-generator.vercel.app/" target="_blank" rel="noopener" class="ai-row">
+        <span class="ai-row-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="4.5" cy="6" r="1.2" fill="var(--ink)" stroke="none"/>
+            <line x1="9" y1="6" x2="20" y2="6"/>
+            <circle cx="4.5" cy="12" r="1.2" fill="var(--ink)" stroke="none"/>
+            <line x1="9" y1="12" x2="20" y2="12"/>
+            <circle cx="4.5" cy="18" r="1.2" fill="var(--ink)" stroke="none"/>
+            <line x1="9" y1="18" x2="20" y2="18"/>
+          </svg>
+        </span>
+        <span class="ai-row-text"><strong>Bullet Generator</strong><span>Paste rough notes or a conversation and get clean bullet points instantly.</span></span>
+        <span class="ai-row-arrow">→</span>
+      </a>
+      <a href="https://case-converter-tau.vercel.app/" target="_blank" rel="noopener" class="ai-row">
+        <span class="ai-row-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2.5 15l3.5-9 3.5 9"/>
+            <path d="M3.6 12.2h4.8"/>
+            <circle cx="16.5" cy="12.3" r="3.2"/>
+            <path d="M19.7 9.5v6"/>
+          </svg>
+        </span>
+        <span class="ai-row-text"><strong>Case Converter</strong><span>Clean and fast text case conversion for everyday use.</span></span>
+        <span class="ai-row-arrow">→</span>
+      </a>
+      <a href="https://utm-builder-pi.vercel.app/" target="_blank" rel="noopener" class="ai-row">
+        <span class="ai-row-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 6"/>
+            <path d="M14 11a5 5 0 0 0-7.07 0L5.5 12.41a5 5 0 0 0 7.07 7.07L14 18"/>
+          </svg>
+        </span>
+        <span class="ai-row-text"><strong>UTM Builder</strong><span>Generate clean UTM links fast (source, medium, campaign) for tracking.</span></span>
+        <span class="ai-row-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact" class="block">
+  <div class="wrap">
+    <h2>Let's talk.</h2>
+    <p>Open to Senior PMM and Head of PMM roles.</p>
+    <div class="contact-cta">
+      <a href="mailto:varshasoni567@gmail.com" class="btn btn-dark">varshasoni567@gmail.com</a>
+      <a href="https://linkedin.com/in/varsha-soni-47abb7b5" target="_blank" rel="noopener" class="btn">LinkedIn ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>© 2026 Varsha Soni · Built with Claude</footer>
+
+<script>
+(function () {
+  var outer = document.querySelector('.work-pin-outer');
+  var inner = document.querySelector('.work-pin-inner');
+  var scrollEl = document.querySelector('.case-scroll');
+  if (!outer || !inner || !scrollEl) return;
+
+  var extra = 0;
+  var outerTop = 0;
+  var BUFFER = 420; // px the section stays pinned before horizontal movement starts, so it doesn't feel like it jumps the instant it lands
+
+  function measure() {
+    extra = Math.max(0, scrollEl.scrollWidth - scrollEl.clientWidth);
+    outer.style.height = (inner.offsetHeight + BUFFER + extra) + 'px';
+    outerTop = outer.getBoundingClientRect().top + window.pageYOffset;
+  }
+
+  function onScroll() {
+    if (extra <= 0) return;
+    var scrolled = window.pageYOffset - outerTop - BUFFER;
+    if (scrolled < 0) scrolled = 0;
+    if (scrolled > extra) scrolled = extra;
+    scrollEl.scrollLeft = scrolled;
+  }
+
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      measure();
+      onScroll();
+    }, 120);
+  });
+
+  window.addEventListener('load', function () {
+    measure();
+    onScroll();
+  });
+
+  measure();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+})();
+</script>
+
+</body>
+</html>
