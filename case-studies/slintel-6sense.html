@@ -283,6 +283,53 @@
     .outcome-tile { flex-basis: calc(50% - 6px); }
     section.cs-block { padding: 28px 0; }
   }
+
+  /* ── CONTACT MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(19,18,16,0.55);
+    z-index: 500;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal-box {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    padding: 32px 28px 28px;
+  }
+  .modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .modal-close:hover { background: var(--pink); }
+  .modal-box h3 { font-size: 22px; margin-bottom: 20px; }
+  .modal-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+  .modal-list li { display: flex; flex-direction: column; gap: 2px; }
+  .modal-list .modal-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .modal-list a { font-size: 16px; font-weight: 700; }
+  .modal-list a:hover { color: var(--pink); }
 </style>
 </head>
 <body>
@@ -298,7 +345,7 @@
     </ul>
     <div class="nav-right">
       <a href="../cv.html" class="btn btn-sm" target="_blank">CV ↓</a>
-      <a href="mailto:varshasoni567@gmail.com" class="btn btn-sm btn-dark">Get in touch</a>
+      <button type="button" class="btn btn-sm btn-dark" onclick="openContactModal()">Get in touch</button>
     </div>
   </div>
 </nav>
@@ -469,12 +516,45 @@
 
   <div class="cs-cta">
     <a href="../index.html#work" class="btn btn-dark">← Back to case studies</a>
-    <a href="mailto:varshasoni567@gmail.com" class="btn">Get in touch</a>
+    <button type="button" class="btn" onclick="openContactModal()">Get in touch</button>
   </div>
 
 </div>
 
 <footer>© 2026 Varsha Soni · Built with Claude</footer>
+
+<!-- ── CONTACT MODAL ── -->
+<div class="modal-overlay" id="contact-modal" onclick="if (event.target === this) closeContactModal()">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
+    <button type="button" class="modal-close" onclick="closeContactModal()" aria-label="Close">✕</button>
+    <h3 id="contact-modal-title">Get in touch</h3>
+    <ul class="modal-list">
+      <li>
+        <span class="modal-label">Phone</span>
+        <a href="tel:+917406636656">+91 7406636656</a>
+      </li>
+      <li>
+        <span class="modal-label">Email</span>
+        <a href="mailto:varshasoni567@gmail.com">varshasoni567@gmail.com</a>
+      </li>
+      <li>
+        <span class="modal-label">LinkedIn</span>
+        <a href="https://linkedin.com/in/varsha-soni-47abb7b5" target="_blank" rel="noopener">linkedin.com/in/varsha-soni-47abb7b5</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<script>
+(function () {
+  var modal = document.getElementById('contact-modal');
+  window.openContactModal = function () { modal.classList.add('open'); };
+  window.closeContactModal = function () { modal.classList.remove('open'); };
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeContactModal();
+  });
+})();
+</script>
 
 </body>
 </html>
