@@ -138,23 +138,41 @@
 
   .hero-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
+    grid-template-columns: repeat(3, max-content);
+    gap: 32px;
     margin-top: 40px;
     padding-top: 28px;
     border-top: 2px solid var(--line);
-    max-width: 460px;
+    width: fit-content;
+    max-width: 100%;
+  }
+  .hero-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  .hero-stat-top {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
   }
   .hero-stat strong {
     font-family: var(--font-sans);
     font-size: 26px;
+    line-height: 1;
+  }
+  .hero-stat-logo-img {
+    height: 32px;
+    width: auto;
     display: block;
+    filter: grayscale(100%);
   }
   .hero-stat span {
-    font-size: 12px;
+    font-size: 10px;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    white-space: nowrap;
     display: block;
   }
 
@@ -164,11 +182,10 @@
     max-width: 352px;
     border: 2px solid var(--line);
     border-radius: 20px;
-    background: var(--card);
     box-shadow: var(--shadow);
-    padding: 14px;
+    overflow: hidden;
   }
-  .hero-photo img { width: 100%; display: block; border-radius: 12px; }
+  .hero-photo img { width: 100%; display: block; }
   .hero-photo-caption {
     font-family: var(--font-sans);
     font-weight: 700;
@@ -257,21 +274,12 @@
   .case-cta {
     display: inline-flex;
     align-items: center;
-    gap: 8px;
-    font-family: var(--font-sans);
-    font-weight: 700;
-    font-size: 12.5px;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: var(--bg);
-    background: #1F1D19;
-    border: 2px solid var(--pink);
-    border-radius: 8px;
-    padding: 11px 18px;
-    box-shadow: 3px 3px 0 var(--pink);
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    font-weight: 900;
+    font-size: 22px;
+    color: var(--pink);
+    transition: transform 0.12s ease;
   }
-  .case-cta:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--pink); }
+  .case-card:hover .case-cta { transform: translateX(5px); }
 
   /* ── AI SECTION ── */
   .ai-list { border-top: 2px solid var(--line); margin-top: 8px; }
@@ -381,7 +389,7 @@
     .case-section { margin: 0 14px; }
     .case-section .wrap { padding: 44px 22px; }
     .case-section .sec-head { margin-bottom: 44px; }
-    .hero-stats { grid-template-columns: repeat(2, 1fr); max-width: none; }
+    .hero-stats { grid-template-columns: repeat(3, max-content); gap: 18px; max-width: 100%; }
   }
 </style>
 </head>
@@ -390,15 +398,9 @@
 <!-- ── NAV ── -->
 <nav>
   <div class="nav-inner">
-    <a href="#" class="nav-brand">Varsha Soni</a>
-    <ul class="nav-links" style="list-style:none;">
-      <li><a href="#work">Case Studies</a></li>
-      <li><a href="#ai">AI Tools</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
+    <a href="#" class="nav-brand">Hi, I'm Varsha Soni.</a>
     <div class="nav-right">
       <a href="cv.html" class="btn btn-sm" target="_blank">CV ↓</a>
-      <button type="button" class="btn btn-sm btn-dark" onclick="openContactModal()">Get in touch</button>
     </div>
   </div>
 </nav>
@@ -408,17 +410,16 @@
   <div class="wrap">
     <div class="hero-grid">
       <div>
-        <h1>I turn early-stage B2B SaaS products into GTM that scales.</h1>
-        <p class="hero-sub">Hi, I'm Varsha. A Senior Product Marketing Manager with 7 years in B2B SaaS, usually the first or founding PMM in the room. I do the fundamentals well: positioning, launches, and content systems that compound, built and shipped end-to-end, not just planned.</p>
+        <h1>I love product marketing.</h1>
+        <p class="hero-sub">And yes, where I come from, my name actually means rain and we pray for it to stop. I don't. Usually the first PMM in the team, I've been learning and growing for 7 years. I build positioning and ship launches that compound.</p>
         <div class="hero-cta">
-          <a href="#work" class="btn btn-dark">See the case studies →</a>
+          <a href="#work" class="btn btn-dark">See my work →</a>
           <button type="button" class="btn" onclick="openContactModal()">Get in touch</button>
         </div>
         <div class="hero-stats">
-          <div class="hero-stat"><strong>5x</strong><span>ARR in 12 months</span></div>
-          <div class="hero-stat"><strong>$20M</strong><span>Series A raised</span></div>
-          <div class="hero-stat"><strong>1</strong><span>Acquisition (6sense)</span></div>
-          <div class="hero-stat"><strong>7 yrs</strong><span>B2B SaaS PMM</span></div>
+          <div class="hero-stat"><div class="hero-stat-top"><img src="images/slintel-logo-wide.png" alt="Slintel" class="hero-stat-logo-img"></div><span>Acquired by 6sense</span></div>
+          <div class="hero-stat"><div class="hero-stat-top"><strong>5x</strong></div><span>ARR in 12 months</span></div>
+          <div class="hero-stat"><div class="hero-stat-top"><strong>$20M</strong></div><span>Series A raised</span></div>
         </div>
       </div>
       <div class="hero-photo-wrap">
@@ -436,12 +437,12 @@
   <div class="wrap">
     <div class="sec-head">
       <span class="label">— Case Studies —</span>
-      <h2>Work that moved numbers.</h2>
+      <h2>Work that moved numbers</h2>
       <p>Four roles, one pattern: walk in early and build the GTM engine from scratch.</p>
     </div>
 
     <div class="case-scroll">
-      <div class="case-card">
+      <a href="case-studies/slintel-6sense.html" class="case-card">
         <div class="case-meta"><span class="case-co">Slintel → 6sense</span><span class="case-dot"></span><span class="case-tenure">Aug 2019 – Mar 2023</span></div>
         <h3 class="case-title">Slintel's Inbound Engine</h3>
         <p class="case-desc">One of the first two marketers at Slintel, growing into the PMM role while building the inbound engine from scratch.</p>
@@ -453,10 +454,10 @@
             <li>Acquired by 6sense</li>
           </ul>
         </div>
-        <div class="case-cta-row"><a href="case-studies/slintel-6sense.html" class="case-cta">Read the case study →</a></div>
-      </div>
+        <div class="case-cta-row"><span class="case-cta">→</span></div>
+      </a>
 
-      <div class="case-card">
+      <a href="case-studies/fincent-ios-launch.html" class="case-card">
         <div class="case-meta"><span class="case-co">Fincent</span><span class="case-dot"></span><span class="case-tenure">Mar 2023 – Apr 2024</span></div>
         <h3 class="case-title">Building Fincent's Product Marketing</h3>
         <p class="case-desc">Built Fincent's product marketing function from scratch: web infrastructure, iOS launch, SEO content, and a scalable demo program.</p>
@@ -468,10 +469,10 @@
             <li>6 feature pages, 3 competitor pages</li>
           </ul>
         </div>
-        <div class="case-cta-row"><a href="case-studies/fincent-ios-launch.html" class="case-cta">Read the case study →</a></div>
-      </div>
+        <div class="case-cta-row"><span class="case-cta">→</span></div>
+      </a>
 
-      <div class="case-card">
+      <a href="case-studies/justcall-webinar.html" class="case-card">
         <div class="case-meta"><span class="case-co">JustCall</span><span class="case-dot"></span><span class="case-tenure">Dec 2024 – Feb 2026</span></div>
         <h3 class="case-title">The JustCall Launch System</h3>
         <p class="case-desc">Built the tiered launch system behind 30+ GTM releases at JustCall, then used it to launch the flagship AI Voice Agent to $1M ARR.</p>
@@ -483,10 +484,10 @@
             <li>43% newsletter open rate</li>
           </ul>
         </div>
-        <div class="case-cta-row"><a href="case-studies/justcall-webinar.html" class="case-cta">Read the case study →</a></div>
-      </div>
+        <div class="case-cta-row"><span class="case-cta">→</span></div>
+      </a>
 
-      <div class="case-card">
+      <a href="case-studies/justcall-integrations.html" class="case-card">
         <div class="case-meta"><span class="case-co">JustCall</span><span class="case-dot"></span><span class="case-tenure">Dec 2024 – Feb 2026</span></div>
         <h3 class="case-title">Integrations Into a Signup Channel</h3>
         <p class="case-desc">Rebuilt JustCall's flagship integration page around a control-tested structure, then made it the template for the rest of the directory.</p>
@@ -498,8 +499,8 @@
             <li>23 of 70+ pages revamped</li>
           </ul>
         </div>
-        <div class="case-cta-row"><a href="case-studies/justcall-integrations.html" class="case-cta">Read the case study →</a></div>
-      </div>
+        <div class="case-cta-row"><span class="case-cta">→</span></div>
+      </a>
     </div>
   </div>
   </div>
@@ -510,11 +511,10 @@
 <section id="ai" class="block">
   <div class="wrap">
     <div class="sec-head">
-      <span class="label">— How I Use AI —</span>
-      <h2>Where AI Actually Helps</h2>
+      <span class="label">— AI Tools —</span>
+      <h2>Where AI earns its keep</h2>
     </div>
     <p class="ai-body">I'm proficient with AI tools generally, and I use them to build artefacts, live tools, and prototypes that actually work:<br>things that take load off other teams, and cut down on busywork.</p>
-    <p class="ai-body">Below are a few tools I've built.</p>
     <div class="ai-list">
       <a href="https://headline-analyzer-ten.vercel.app/" target="_blank" rel="noopener" class="ai-row">
         <span class="ai-row-icon">
@@ -574,6 +574,17 @@
         <span class="ai-row-text"><strong>UTM Builder</strong><span>Generate clean UTM links fast (source, medium, campaign) for tracking.</span></span>
         <span class="ai-row-arrow">→</span>
       </a>
+      <a href="https://image-background-remover-lyart.vercel.app/" target="_blank" rel="noopener" class="ai-row">
+        <span class="ai-row-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="16" rx="2"/>
+            <circle cx="8.5" cy="9.5" r="1.3" fill="var(--ink)" stroke="none"/>
+            <path d="M21 15l-5-5-4 4-3-3-6 6"/>
+          </svg>
+        </span>
+        <span class="ai-row-text"><strong>Image Background Remover</strong><span>Remove image backgrounds with flood-fill colour detection, entirely in your browser.</span></span>
+        <span class="ai-row-arrow">→</span>
+      </a>
     </div>
   </div>
 </section>
@@ -581,8 +592,8 @@
 <!-- ── CONTACT ── -->
 <section id="contact" class="block">
   <div class="wrap">
-    <h2>Let's talk.</h2>
-    <p>Open to PMM and Senior PMM roles.</p>
+    <h2>Let's talk</h2>
+    <p>Open to Senior PMM roles.</p>
     <div class="contact-cta">
       <button type="button" class="btn btn-dark" onclick="openContactModal()">Contact details</button>
       <a href="https://linkedin.com/in/varsha-soni-47abb7b5" target="_blank" rel="noopener" class="btn">LinkedIn ↗</a>
