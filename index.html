@@ -364,6 +364,7 @@
     box-shadow: var(--shadow);
     padding: 32px 28px 28px;
   }
+  #contact-modal .modal-box { max-width: 460px; overflow: hidden; }
   .modal-close {
     position: absolute;
     top: 14px;
@@ -388,6 +389,16 @@
   .modal-list .modal-label { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
   .modal-list a { font-size: 16px; font-weight: 700; }
   .modal-list a:hover { color: var(--pink); }
+  .modal-body { display: flex; flex-direction: column; min-width: 0; }
+  .modal-calendly { margin-top: 22px; padding-top: 18px; border-top: 2px solid var(--line); min-width: 0; }
+  .calendly-embed { width: 100%; max-width: 100%; height: 420px; margin-top: 8px; overflow: hidden; }
+
+  @media (min-width: 700px) {
+    #contact-modal .modal-box { max-width: 640px; }
+    .modal-body { flex-direction: row; align-items: flex-start; gap: 24px; }
+    .modal-list { flex: 0 0 180px; }
+    .modal-calendly { flex: 1 1 auto; margin-top: 0; padding-top: 0; border-top: none; border-left: 2px solid var(--line); padding-left: 24px; }
+  }
 
   @media (max-width: 760px) {
     .nav-links { display: none; }
@@ -633,31 +644,59 @@
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="contact-modal-title">
     <button type="button" class="modal-close" onclick="closeContactModal()" aria-label="Close">✕</button>
     <h3 id="contact-modal-title">Get in touch</h3>
-    <ul class="modal-list">
-      <li>
-        <span class="modal-label">Phone</span>
-        <a href="tel:+917406636656">+91 7406636656</a>
-      </li>
-      <li>
-        <span class="modal-label">Email</span>
-        <a href="mailto:varshasoni567@gmail.com">varshasoni567@gmail.com</a>
-      </li>
-      <li>
-        <span class="modal-label">LinkedIn</span>
-        <a href="https://linkedin.com/in/varsha-soni-47abb7b5" target="_blank" rel="noopener">linkedin.com/in/varsha-soni-47abb7b5</a>
-      </li>
-    </ul>
+    <div class="modal-body">
+      <ul class="modal-list">
+        <li>
+          <span class="modal-label">Phone</span>
+          <a href="tel:+917406636656">+91 7406636656</a>
+        </li>
+        <li>
+          <span class="modal-label">Email</span>
+          <a href="mailto:varshasoni567@gmail.com">varshasoni567@gmail.com</a>
+        </li>
+        <li>
+          <span class="modal-label">LinkedIn</span>
+          <a href="https://linkedin.com/in/varsha-soni-47abb7b5" target="_blank" rel="noopener">View profile ↗</a>
+        </li>
+      </ul>
+      <div class="modal-calendly">
+        <span class="modal-label">Book a call</span>
+        <div id="calendly-embed" class="calendly-embed"></div>
+      </div>
+    </div>
   </div>
 </div>
 
+<script id="calendly-widget-script" src="https://assets.calendly.com/assets/external/widget.js" defer></script>
 <script>
 (function () {
   var modal = document.getElementById('contact-modal');
-  window.openContactModal = function () { modal.classList.add('open'); };
+  var calendlyInitialized = false;
+
+  function initCalendly() {
+    if (calendlyInitialized || !window.Calendly) return;
+    window.Calendly.initInlineWidget({
+      url: 'https://calendly.com/varshasoni567/30min?hide_gdpr_banner=1&hide_event_type_details=1',
+      parentElement: document.getElementById('calendly-embed')
+    });
+    calendlyInitialized = true;
+  }
+
+  window.openContactModal = function () {
+    modal.classList.add('open');
+    // Wait for the modal's layout to settle before Calendly measures its
+    // container — initializing on the same tick the modal becomes visible
+    // makes Calendly read a stale (pre-open) width and fall back to a wide
+    // fixed size that overflows the page.
+    requestAnimationFrame(function () { requestAnimationFrame(initCalendly); });
+  };
   window.closeContactModal = function () { modal.classList.remove('open'); };
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape') closeContactModal();
   });
+
+  var calendlyScript = document.getElementById('calendly-widget-script');
+  if (calendlyScript) calendlyScript.addEventListener('load', initCalendly);
 })();
 </script>
 
