@@ -293,33 +293,50 @@
   .case-card:hover .case-cta { transform: translateX(5px); }
 
   /* ── AI SECTION ── */
-  .ai-list { border-top: 2px solid var(--line); margin-top: 8px; }
-  .ai-row {
+  .ai-list {
     display: flex;
-    align-items: center;
-    gap: 18px;
-    padding: 16px 4px;
-    border-bottom: 2px solid var(--line);
-    transition: background 0.12s ease;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
   }
-  .ai-row:hover { background: rgba(214,156,140,0.14); }
+  .ai-row {
+    flex: 0 0 calc(25% - 12px);
+    width: calc(25% - 12px);
+    max-width: calc(25% - 12px);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 10px;
+    padding: 22px 14px;
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .ai-row:hover { transform: translate(-2px,-2px); box-shadow: var(--shadow); }
   .ai-row-icon {
-    width: 40px;
-    height: 40px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--pink);
-    border: 2px solid var(--line);
-    border-radius: 10px;
   }
-  .ai-row-icon svg { width: 20px; height: 20px; }
-  .ai-row-text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .ai-row-text strong { font-family: var(--font-sans); font-weight: 700; font-size: 17px; }
-  .ai-row-text span { color: var(--muted); font-size: 14px; }
-  .ai-row-arrow { font-weight: 700; font-size: 18px; color: var(--pink); transition: transform 0.12s ease; flex-shrink: 0; }
-  .ai-row:hover .ai-row-arrow { transform: translateX(4px); }
+  .ai-row-icon svg { width: 24px; height: 24px; }
+  .ai-row-head { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+  .ai-row-head strong { font-family: var(--font-sans); font-weight: 700; font-size: 15px; }
+  .ai-row-desc {
+    color: var(--muted);
+    font-size: 12.5px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .ai-row-arrow { display: none; }
   .ai-body + .ai-body { margin-top: -32px; }
   .ai-body {
     max-width: 900px;
@@ -407,7 +424,7 @@
     .case-section .sec-head p { white-space: normal; max-width: 52ch; }
     .case-scroll { margin: 0 -22px; padding-left: 22px; padding-right: 22px; }
     .case-card { flex-basis: 85%; padding: 20px 18px; }
-    .ai-row { flex-wrap: wrap; }
+    .ai-row { flex: 0 0 calc(50% - 8px); width: calc(50% - 8px); max-width: calc(50% - 8px); }
     .case-section { margin: 0 14px; }
     .case-section .wrap { padding: 44px 22px; }
     .case-section .sec-head { margin-bottom: 44px; }
@@ -543,82 +560,103 @@
     <p class="ai-body">I'm proficient with AI tools generally, and I use them to build artefacts, live tools, and prototypes that actually work: things that take load off other teams, and cut down on busywork. A few tools I built for daily use below.</p>
     <div class="ai-list">
       <a href="/tools/headline-analyzer/" target="_blank" rel="noopener" class="ai-row">
-        <span class="ai-row-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M4 17a8 8 0 1 1 16 0"/>
-            <path d="M12 13l4-4"/>
-            <circle cx="12" cy="13" r="1.1" fill="var(--ink)" stroke="none"/>
-          </svg>
+        <span class="ai-row-head">
+          <span class="ai-row-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 17a8 8 0 1 1 16 0"/>
+              <path d="M12 13l4-4"/>
+              <circle cx="12" cy="13" r="1.1" fill="var(--ink)" stroke="none"/>
+            </svg>
+          </span>
+          <strong>Headline Analyzer</strong>
         </span>
-        <span class="ai-row-text"><strong>Headline Analyzer</strong><span>Score your headline for power, emotion, length, and readability.</span></span>
+        <span class="ai-row-desc">Score your headline for power, emotion, length, and readability.</span>
         <span class="ai-row-arrow">→</span>
       </a>
       <a href="/tools/positioning-builder/" target="_blank" rel="noopener" class="ai-row">
-        <span class="ai-row-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="8"/>
-            <circle cx="12" cy="12" r="4.3"/>
-            <circle cx="12" cy="12" r="1.1" fill="var(--ink)" stroke="none"/>
-          </svg>
+        <span class="ai-row-head">
+          <span class="ai-row-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="8"/>
+              <circle cx="12" cy="12" r="4.3"/>
+              <circle cx="12" cy="12" r="1.1" fill="var(--ink)" stroke="none"/>
+            </svg>
+          </span>
+          <strong>Positioning Builder</strong>
         </span>
-        <span class="ai-row-text"><strong>Positioning Builder</strong><span>Turn a few plain-language answers into ready-to-use positioning.</span></span>
+        <span class="ai-row-desc">Turn a few plain-language answers into ready-to-use positioning.</span>
         <span class="ai-row-arrow">→</span>
       </a>
       <a href="/tools/bullet-generator/" target="_blank" rel="noopener" class="ai-row">
-        <span class="ai-row-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="4.5" cy="6" r="1.2" fill="var(--ink)" stroke="none"/>
-            <line x1="9" y1="6" x2="20" y2="6"/>
-            <circle cx="4.5" cy="12" r="1.2" fill="var(--ink)" stroke="none"/>
-            <line x1="9" y1="12" x2="20" y2="12"/>
-            <circle cx="4.5" cy="18" r="1.2" fill="var(--ink)" stroke="none"/>
-            <line x1="9" y1="18" x2="20" y2="18"/>
-          </svg>
+        <span class="ai-row-head">
+          <span class="ai-row-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="4.5" cy="6" r="1.2" fill="var(--ink)" stroke="none"/>
+              <line x1="9" y1="6" x2="20" y2="6"/>
+              <circle cx="4.5" cy="12" r="1.2" fill="var(--ink)" stroke="none"/>
+              <line x1="9" y1="12" x2="20" y2="12"/>
+              <circle cx="4.5" cy="18" r="1.2" fill="var(--ink)" stroke="none"/>
+              <line x1="9" y1="18" x2="20" y2="18"/>
+            </svg>
+          </span>
+          <strong>Bullet Generator</strong>
         </span>
-        <span class="ai-row-text"><strong>Bullet Generator</strong><span>Paste rough notes or a conversation and get clean bullet points instantly.</span></span>
+        <span class="ai-row-desc">Paste rough notes or a conversation and get clean bullet points instantly.</span>
         <span class="ai-row-arrow">→</span>
       </a>
       <a href="/tools/case-converter/" target="_blank" rel="noopener" class="ai-row">
-        <span class="ai-row-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2.5 15l3.5-9 3.5 9"/>
-            <path d="M3.6 12.2h4.8"/>
-            <circle cx="16.5" cy="12.3" r="3.2"/>
-            <path d="M19.7 9.5v6"/>
-          </svg>
+        <span class="ai-row-head">
+          <span class="ai-row-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2.5 15l3.5-9 3.5 9"/>
+              <path d="M3.6 12.2h4.8"/>
+              <circle cx="16.5" cy="12.3" r="3.2"/>
+              <path d="M19.7 9.5v6"/>
+            </svg>
+          </span>
+          <strong>Case Converter</strong>
         </span>
-        <span class="ai-row-text"><strong>Case Converter</strong><span>Clean and fast text case conversion for everyday use.</span></span>
+        <span class="ai-row-desc">Clean and fast text case conversion for everyday use.</span>
         <span class="ai-row-arrow">→</span>
       </a>
       <a href="/tools/utm-builder/" target="_blank" rel="noopener" class="ai-row">
-        <span class="ai-row-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 6"/>
-            <path d="M14 11a5 5 0 0 0-7.07 0L5.5 12.41a5 5 0 0 0 7.07 7.07L14 18"/>
-          </svg>
+        <span class="ai-row-head">
+          <span class="ai-row-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10 13a5 5 0 0 0 7.07 0l1.41-1.41a5 5 0 0 0-7.07-7.07L10 6"/>
+              <path d="M14 11a5 5 0 0 0-7.07 0L5.5 12.41a5 5 0 0 0 7.07 7.07L14 18"/>
+            </svg>
+          </span>
+          <strong>UTM Builder</strong>
         </span>
-        <span class="ai-row-text"><strong>UTM Builder</strong><span>Generate clean UTM links fast (source, medium, campaign) for tracking.</span></span>
+        <span class="ai-row-desc">Add source, medium, and campaign tags to build clean UTM links.</span>
         <span class="ai-row-arrow">→</span>
       </a>
       <a href="/tools/background-remover/" target="_blank" rel="noopener" class="ai-row">
-        <span class="ai-row-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="16" rx="2"/>
-            <circle cx="8.5" cy="9.5" r="1.3" fill="var(--ink)" stroke="none"/>
-            <path d="M21 15l-5-5-4 4-3-3-6 6"/>
-          </svg>
+        <span class="ai-row-head">
+          <span class="ai-row-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="4" width="18" height="16" rx="2"/>
+              <circle cx="8.5" cy="9.5" r="1.3" fill="var(--ink)" stroke="none"/>
+              <path d="M21 15l-5-5-4 4-3-3-6 6"/>
+            </svg>
+          </span>
+          <strong>Background Remover</strong>
         </span>
-        <span class="ai-row-text"><strong>Image Background Remover</strong><span>Remove image backgrounds automatically, entirely in your browser.</span></span>
+        <span class="ai-row-desc">Erase image backgrounds instantly, right in your browser.</span>
         <span class="ai-row-arrow">→</span>
       </a>
       <a href="/tools/border-studio/" target="_blank" rel="noopener" class="ai-row">
-        <span class="ai-row-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="2.5" y="2.5" width="19" height="19" rx="2"/>
-            <rect x="7" y="7" width="10" height="10" rx="1"/>
-          </svg>
+        <span class="ai-row-head">
+          <span class="ai-row-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="var(--ink)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="2.5" y="2.5" width="19" height="19" rx="2"/>
+              <rect x="7" y="7" width="10" height="10" rx="1"/>
+            </svg>
+          </span>
+          <strong>Border Studio</strong>
         </span>
-        <span class="ai-row-text"><strong>Border Studio</strong><span>Add a border and drop shadow to any photo, with full control over colour and style.</span></span>
+        <span class="ai-row-desc">Add a border and drop shadow to any photo, styled your way.</span>
         <span class="ai-row-arrow">→</span>
       </a>
     </div>
