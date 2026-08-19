@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UTM Builder</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand:         #F7F4EC;
+  --terra:        #D69C8C;
+  --golden:       #F0C9BA;
+  --near-black:   #131210;
+  --brown:        #6B6558;
+  --white:        #FFFFFF;
+  --border:       2px solid #131210;
+  --shadow-black: 4px 4px 0 #131210;
+  --shadow-terra: 4px 4px 0 #D69C8C;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--sand);
+  color: var(--near-black);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 800px; margin: 0 auto;
+  padding: 56px 40px 80px;
+}
+
+header { margin-bottom: 24px; }
+
+h1 {
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--brown);
+  max-width: 62ch;
+}
+
+/* ── Input card ─────────────────────────────────────────── */
+.input-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-black);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.mode-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.mode-picker { display: flex; gap: 4px; }
+
+.mode-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.95rem;
+  border: var(--border);
+  border-radius: 99px;
+  background: transparent;
+  color: var(--near-black);
+  cursor: pointer;
+  transition: box-shadow 0.12s, transform 0.1s, background 0.12s;
+  white-space: nowrap;
+}
+.mode-btn:hover  { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px,-1px); }
+.mode-btn:active { box-shadow: none; transform: translate(1px,1px); }
+.mode-btn.active { background: var(--golden); }
+
+.clear-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 1.1rem;
+  border: var(--border);
+  border-radius: 99px;
+  background: var(--terra);
+  color: var(--near-black);
+  cursor: pointer;
+  transition: box-shadow 0.12s, transform 0.1s;
+  white-space: nowrap;
+}
+.clear-btn:hover  { box-shadow: var(--shadow-black); transform: translate(-1px,-1px); }
+.clear-btn:active { box-shadow: none; transform: translate(2px,2px); }
+
+/* ── Fields ─────────────────────────────────────────────── */
+.field { margin-bottom: 16px; }
+.field:last-child { margin-bottom: 0; }
+
+.field-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 6px;
+  color: var(--near-black);
+}
+.req { color: var(--terra); }
+
+.text-input {
+  display: block;
+  width: 100%;
+  padding: 0.75rem 0.9rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--near-black);
+  background: var(--sand);
+  border: var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: box-shadow 0.15s;
+}
+.text-input:focus { box-shadow: 3px 3px 0 var(--terra); }
+.text-input::placeholder { color: var(--brown); opacity: 0.6; }
+.text-input.mono { font-family: 'SFMono-Regular', Menlo, Consolas, monospace; }
+
+textarea.text-input { resize: vertical; min-height: 120px; line-height: 1.6; }
+
+.field-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 20px;
+}
+.field-grid .span-2 { grid-column: 1 / -1; }
+
+/* ── Warning banner ─────────────────────────────────────── */
+.warn-banner {
+  margin-top: 10px;
+  padding: 0.55rem 0.85rem;
+  background: var(--golden);
+  border: 2px solid var(--near-black);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--near-black);
+}
+
+.hint {
+  margin-top: 14px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--brown);
+}
+
+/* ── Presets ────────────────────────────────────────────── */
+.preset-row { margin-top: 20px; margin-bottom: 4px; }
+
+.preset-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  margin-bottom: 8px;
+}
+
+.preset-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+
+.preset-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 0.4rem 0.9rem;
+  border: var(--border);
+  border-radius: 99px;
+  background: transparent;
+  color: var(--near-black);
+  cursor: pointer;
+  transition: box-shadow 0.12s, transform 0.1s, background 0.12s;
+  white-space: nowrap;
+}
+.preset-btn:hover  { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px,-1px); }
+.preset-btn:active { box-shadow: none; transform: translate(1px,1px); }
+.preset-btn.active { background: var(--golden); }
+
+/* ── Section row ────────────────────────────────────────── */
+.section-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 16px; }
+
+.sec-tag {
+  display: inline-flex; align-items: center;
+  padding: 0.3rem 0.85rem;
+  background: var(--near-black);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: var(--border);
+  border-radius: 99px;
+}
+
+/* ── Empty / output card ────────────────────────────────── */
+.empty-card {
+  background: var(--white);
+  border: 2.5px solid var(--terra);
+  border-radius: 12px;
+  box-shadow: var(--shadow-terra);
+  padding: 48px 32px;
+  text-align: center;
+  color: var(--brown);
+  font-size: 14px;
+}
+
+.output-card {
+  background: var(--white);
+  border: 2.5px solid var(--terra);
+  border-radius: 12px;
+  box-shadow: var(--shadow-terra);
+  padding: 32px;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.card-top-left { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.85rem;
+  background: var(--golden);
+  border: var(--border);
+  border-radius: 99px;
+  cursor: pointer;
+  color: var(--near-black);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  transition: box-shadow 0.12s, transform 0.1s;
+  white-space: nowrap;
+}
+.copy-btn:hover  { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px,-1px); }
+.copy-btn:active { box-shadow: none; transform: translate(1px,1px); }
+.copy-btn.ok     { background: #4C7A4C; color: var(--white); }
+.copy-btn.outline { background: transparent; }
+
+.url-out {
+  font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.7;
+  color: var(--near-black);
+  word-break: break-all;
+  background: var(--sand);
+  border: 2px solid var(--near-black);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+.md-out {
+  margin-top: 14px;
+  font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 13px;
+  color: var(--brown);
+  word-break: break-all;
+}
+
+/* ── Bulk results ───────────────────────────────────────── */
+.bulk-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+.bulk-list { display: flex; flex-direction: column; gap: 12px; }
+
+.bulk-row {
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--near-black);
+  padding: 18px 20px;
+}
+
+.bulk-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 8px;
+}
+
+.bulk-campaign {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.bulk-url {
+  font-family: 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 12.5px;
+  color: var(--near-black);
+  word-break: break-all;
+  line-height: 1.6;
+}
+
+.bulk-error {
+  font-size: 12px;
+  color: var(--terra);
+  font-weight: 700;
+}
+
+/* ── Mobile ─────────────────────────────────────────────── */
+@media (max-width: 620px) {
+  .wrap { padding: 40px 24px 60px; }
+  .field-grid { grid-template-columns: 1fr; }
+}
+</style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1>UTM Builder</h1>
+    <p class="subtitle">Build tagged campaign URLs that show up correctly in Google Analytics, with presets for the platforms you actually run ads on. Switch to bulk mode to tag a whole list of campaigns at once.</p>
+  </header>
+
+  <div class="input-card">
+    <div class="mode-row">
+      <div class="mode-picker" role="group" aria-label="Mode">
+        <button class="mode-btn active" data-mode="single">Single</button>
+        <button class="mode-btn" data-mode="bulk">Bulk</button>
+      </div>
+      <button class="clear-btn" onclick="resetAll()">Reset</button>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Website URL <span class="req">*</span></label>
+      <input type="text" id="baseUrl" class="text-input mono" placeholder="https://example.com/page" autocomplete="off" spellcheck="false">
+      <div class="warn-banner" id="urlWarning" style="display:none">⚠ This URL already has UTM parameters — they'll be replaced.</div>
+    </div>
+
+    <div id="single-fields">
+      <div class="preset-row">
+        <span class="preset-label">Platform preset</span>
+        <div class="preset-grid" id="presetGrid">
+          <button class="preset-btn" data-source="google" data-medium="cpc">Google Ads</button>
+          <button class="preset-btn" data-source="facebook" data-medium="paid-social">Meta / FB Ads</button>
+          <button class="preset-btn" data-source="linkedin" data-medium="paid-social">LinkedIn Ads</button>
+          <button class="preset-btn" data-source="twitter" data-medium="paid-social">Twitter / X Ads</button>
+          <button class="preset-btn" data-source="newsletter" data-medium="email">Newsletter</button>
+          <button class="preset-btn" data-source="email" data-medium="email">Email</button>
+          <button class="preset-btn" data-source="instagram" data-medium="paid-social">Instagram</button>
+          <button class="preset-btn" data-source="youtube" data-medium="video">YouTube</button>
+          <button class="preset-btn active" data-source="" data-medium="">Custom</button>
+        </div>
+      </div>
+
+      <div class="field-grid">
+        <div class="field">
+          <label class="field-label">utm_source <span class="req">*</span></label>
+          <input type="text" id="source" class="text-input" placeholder="google" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label class="field-label">utm_medium <span class="req">*</span></label>
+          <input type="text" id="medium" class="text-input" placeholder="cpc" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field span-2">
+          <label class="field-label">utm_campaign <span class="req">*</span></label>
+          <input type="text" id="campaign" class="text-input" placeholder="spring_sale" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label class="field-label">utm_term</label>
+          <input type="text" id="term" class="text-input" placeholder="paid keywords" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field">
+          <label class="field-label">utm_content</label>
+          <input type="text" id="content" class="text-input" placeholder="ad variant" autocomplete="off" spellcheck="false">
+        </div>
+        <div class="field span-2">
+          <label class="field-label">utm_id</label>
+          <input type="text" id="utmid" class="text-input" placeholder="campaign id (optional)" autocomplete="off" spellcheck="false">
+        </div>
+      </div>
+
+      <p class="hint">Tip: keep values lowercase with no spaces — use hyphens or underscores instead, and stick to a small set of mediums.</p>
+    </div>
+
+    <div id="bulk-fields" style="display:none">
+      <div class="field">
+        <label class="field-label">Rows — one per line: source, medium, campaign, term, content</label>
+        <textarea id="bulkRows" class="text-input mono" rows="6" placeholder="google, cpc, spring_sale
+newsletter, email, spring_sale, , march_edition
+linkedin, paid-social, spring_sale, , carousel_ad"></textarea>
+      </div>
+      <p class="hint">Website URL above is shared across every row. Term and content are optional — leave a slot blank between the commas to skip it.</p>
+    </div>
+  </div>
+
+  <div class="section-row">
+    <span class="sec-tag">Output</span>
+  </div>
+
+  <div id="results"></div>
+
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   Helpers
+--------------------------------------------------------- */
+function normalizeUrl(str) {
+  str = (str || '').trim();
+  if (!str) return str;
+  if (!/^https?:\/\//i.test(str)) str = 'https://' + str;
+  return str;
+}
+
+function parseUrl(str) {
+  const norm = normalizeUrl(str);
+  if (!norm) return null;
+  try { return new URL(norm); } catch { return null; }
+}
+
+function hasExistingUtm(str) {
+  const u = parseUrl(str);
+  if (!u) return false;
+  for (const key of u.searchParams.keys()) {
+    if (/^utm_/i.test(key)) return true;
+  }
+  return false;
+}
+
+function buildTaggedUrl(baseStr, p) {
+  const u = parseUrl(baseStr);
+  if (!u) return null;
+  [...u.searchParams.keys()].filter(k => /^utm_/i.test(k)).forEach(k => u.searchParams.delete(k));
+  const order = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id'];
+  const values = { utm_source: p.source, utm_medium: p.medium, utm_campaign: p.campaign, utm_term: p.term, utm_content: p.content, utm_id: p.id };
+  order.forEach(k => { if (values[k]) u.searchParams.append(k, values[k]); });
+  return u.toString();
+}
+
+/* ---------------------------------------------------------
+   DOM refs & state
+--------------------------------------------------------- */
+let mode = 'single';
+const baseUrlEl = document.getElementById('baseUrl');
+const urlWarningEl = document.getElementById('urlWarning');
+const resultsEl = document.getElementById('results');
+const singleFieldsEl = document.getElementById('single-fields');
+const bulkFieldsEl = document.getElementById('bulk-fields');
+
+const fieldIds = ['source', 'medium', 'campaign', 'term', 'content', 'utmid'];
+const fields = {};
+fieldIds.forEach(id => { fields[id] = document.getElementById(id); });
+const bulkRowsEl = document.getElementById('bulkRows');
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+    singleFieldsEl.style.display = mode === 'single' ? 'block' : 'none';
+    bulkFieldsEl.style.display = mode === 'bulk' ? 'block' : 'none';
+    render();
+  });
+});
+
+document.querySelectorAll('.preset-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    if (btn.dataset.source) fields.source.value = btn.dataset.source;
+    if (btn.dataset.medium) fields.medium.value = btn.dataset.medium;
+    render();
+  });
+});
+
+[baseUrlEl, ...fieldIds.map(id => fields[id]), bulkRowsEl].forEach(el => {
+  el.addEventListener('input', render);
+});
+
+function resetAll() {
+  baseUrlEl.value = '';
+  fieldIds.forEach(id => { fields[id].value = ''; });
+  bulkRowsEl.value = '';
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('.preset-btn[data-source=""]').classList.add('active');
+  render();
+}
+
+/* ---------------------------------------------------------
+   Copy
+--------------------------------------------------------- */
+function copyText(text, btn) {
+  const original = btn.innerHTML;
+  const done = () => {
+    btn.classList.add('ok');
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('ok'); btn.innerHTML = original; }, 1400);
+  };
+  navigator.clipboard.writeText(text).then(done).catch(() => {
+    const tmp = document.createElement('textarea');
+    tmp.value = text;
+    tmp.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+    done();
+  });
+}
+window.copyText = copyText;
+
+/* ---------------------------------------------------------
+   Render
+--------------------------------------------------------- */
+function render() {
+  const rawBase = baseUrlEl.value;
+  urlWarningEl.style.display = hasExistingUtm(rawBase) ? 'block' : 'none';
+
+  if (mode === 'single') renderSingle(rawBase);
+  else renderBulk(rawBase);
+}
+
+function renderSingle(rawBase) {
+  if (!rawBase.trim()) {
+    resultsEl.innerHTML = `<div class="empty-card">Enter a website URL to get started.</div>`;
+    return;
+  }
+  if (!parseUrl(rawBase)) {
+    resultsEl.innerHTML = `<div class="empty-card">That doesn't look like a valid URL yet.</div>`;
+    return;
+  }
+
+  const p = {
+    source: fields.source.value.trim(),
+    medium: fields.medium.value.trim(),
+    campaign: fields.campaign.value.trim(),
+    term: fields.term.value.trim(),
+    content: fields.content.value.trim(),
+    id: fields.utmid.value.trim()
+  };
+
+  if (!p.source || !p.medium || !p.campaign) {
+    resultsEl.innerHTML = `<div class="empty-card">Fill in utm_source, utm_medium, and utm_campaign to generate your link.</div>`;
+    return;
+  }
+
+  const url = buildTaggedUrl(rawBase, p);
+  const md = `[${p.campaign}](${url})`;
+
+  resultsEl.innerHTML = `
+    <div class="output-card">
+      <div class="card-top">
+        <div class="card-top-left">
+          <button class="copy-btn" onclick="copyText(${JSON.stringify(url)}, this)">Copy URL</button>
+          <button class="copy-btn outline" onclick="copyText(${JSON.stringify(md)}, this)">Copy MD</button>
+        </div>
+      </div>
+      <div class="url-out">${escapeHtml(url)}</div>
+      <div class="md-out">${escapeHtml(md)}</div>
+    </div>`;
+}
+
+function renderBulk(rawBase) {
+  if (!rawBase.trim()) {
+    resultsEl.innerHTML = `<div class="empty-card">Enter a website URL to get started.</div>`;
+    return;
+  }
+  if (!parseUrl(rawBase)) {
+    resultsEl.innerHTML = `<div class="empty-card">That doesn't look like a valid URL yet.</div>`;
+    return;
+  }
+
+  const lines = bulkRowsEl.value.split('\n').map(l => l.trim()).filter(Boolean);
+  if (!lines.length) {
+    resultsEl.innerHTML = `<div class="empty-card">Add rows in the format: source, medium, campaign, term, content</div>`;
+    return;
+  }
+
+  const rows = lines.map(line => {
+    const cols = line.split(',').map(c => c.trim());
+    const [source, medium, campaign, term, content] = cols;
+    if (!source || !medium || !campaign) {
+      return { line, error: true };
+    }
+    const url = buildTaggedUrl(rawBase, { source, medium, campaign, term, content, id: '' });
+    return { line, campaign, url, error: false };
+  });
+
+  const validUrls = rows.filter(r => !r.error).map(r => r.url);
+
+  resultsEl.innerHTML = `
+    <div class="bulk-toolbar">
+      <button class="copy-btn" ${validUrls.length ? '' : 'disabled'} onclick="copyText(${JSON.stringify(validUrls.join('\n'))}, this)">Copy all (${validUrls.length})</button>
+    </div>
+    <div class="bulk-list">
+      ${rows.map(r => r.error
+        ? `<div class="bulk-row"><div class="bulk-error">Skipped — needs at least source, medium, campaign: "${escapeHtml(r.line)}"</div></div>`
+        : `<div class="bulk-row">
+             <div class="bulk-row-top">
+               <span class="bulk-campaign">${escapeHtml(r.campaign)}</span>
+               <button class="copy-btn" onclick="copyText(${JSON.stringify(r.url)}, this)">Copy</button>
+             </div>
+             <div class="bulk-url">${escapeHtml(r.url)}</div>
+           </div>`
+      ).join('')}
+    </div>`;
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+render();
+</script>
+</body>
+</html>

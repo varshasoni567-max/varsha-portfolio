@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Headline Analyzer</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand:         #F7F4EC;
+  --terra:        #D69C8C;
+  --golden:       #F0C9BA;
+  --near-black:   #131210;
+  --brown:        #6B6558;
+  --white:        #FFFFFF;
+  --border:       2px solid #131210;
+  --shadow-black: 4px 4px 0 #131210;
+  --shadow-terra: 4px 4px 0 #D69C8C;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--sand);
+  color: var(--near-black);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 800px; margin: 0 auto;
+  padding: 56px 40px 80px;
+}
+
+header { margin-bottom: 24px; }
+
+h1 {
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+}
+
+.subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--brown);
+}
+
+/* ── Info card ──────────────────────────────────────────── */
+.info-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-black);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.info-card p {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--brown);
+}
+
+/* ── Input card ─────────────────────────────────────────── */
+.input-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-black);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+.mode-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.mode-picker { display: flex; gap: 4px; }
+
+.mode-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.35rem 0.95rem;
+  border: var(--border);
+  border-radius: 99px;
+  background: transparent;
+  color: var(--near-black);
+  cursor: pointer;
+  transition: box-shadow 0.12s, transform 0.1s, background 0.12s;
+  white-space: nowrap;
+}
+.mode-btn:hover  { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px,-1px); }
+.mode-btn:active { box-shadow: none; transform: translate(1px,1px); }
+.mode-btn.active { background: var(--golden); }
+
+.clear-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 1.1rem;
+  border: var(--border);
+  border-radius: 99px;
+  background: var(--terra);
+  color: var(--near-black);
+  cursor: pointer;
+  transition: box-shadow 0.12s, transform 0.1s;
+  white-space: nowrap;
+}
+.clear-btn:hover  { box-shadow: var(--shadow-black); transform: translate(-1px,-1px); }
+.clear-btn:active { box-shadow: none; transform: translate(2px,2px); }
+
+/* ── Headline inputs ────────────────────────────────────── */
+#headline-list { display: flex; flex-direction: column; gap: 12px; }
+
+.headline-row { display: flex; align-items: center; gap: 8px; }
+
+.headline-input {
+  flex: 1;
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--near-black);
+  background: var(--sand);
+  border: var(--border);
+  border-radius: 8px;
+  outline: none;
+  transition: box-shadow 0.15s;
+}
+.headline-input:focus { box-shadow: 3px 3px 0 var(--terra); }
+.headline-input::placeholder { color: var(--brown); opacity: 0.6; font-weight: 400; }
+
+.remove-btn {
+  flex-shrink: 0;
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: var(--border);
+  border-radius: 8px;
+  background: var(--white);
+  color: var(--near-black);
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 700;
+  transition: box-shadow 0.12s, transform 0.1s;
+}
+.remove-btn:hover  { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px,-1px); }
+.remove-btn:active { box-shadow: none; transform: translate(1px,1px); }
+
+.add-btn {
+  margin-top: 14px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.5rem 1rem;
+  border: 2.5px dashed var(--near-black);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--near-black);
+  cursor: pointer;
+  width: 100%;
+  transition: background 0.12s;
+}
+.add-btn:hover { background: var(--sand); }
+.add-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ── Section row ────────────────────────────────────────── */
+.section-row { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 16px; }
+
+.sec-tag {
+  display: inline-flex; align-items: center;
+  padding: 0.3rem 0.85rem;
+  background: var(--near-black);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: var(--border);
+  border-radius: 99px;
+}
+
+/* ── Empty state ────────────────────────────────────────── */
+.empty-card {
+  background: var(--white);
+  border: 2.5px solid var(--terra);
+  border-radius: 12px;
+  box-shadow: var(--shadow-terra);
+  padding: 48px 32px;
+  text-align: center;
+  color: var(--brown);
+  font-size: 14px;
+}
+
+/* ── Output card (single mode) ─────────────────────────── */
+.output-card {
+  background: var(--white);
+  border: 2.5px solid var(--terra);
+  border-radius: 12px;
+  box-shadow: var(--shadow-terra);
+  padding: 32px;
+}
+
+.headline-preview {
+  font-size: clamp(1.15rem, 3vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 20px;
+  word-break: break-word;
+}
+
+.hl-power    { background: var(--golden); padding: 0 3px; border-radius: 4px; }
+.hl-positive { background: rgba(214,156,140,0.3); padding: 0 3px; border-radius: 4px; }
+.hl-negative { background: rgba(214,156,140,0.3); padding: 0 3px; border-radius: 4px; text-decoration: underline wavy var(--terra); text-decoration-thickness: 1.5px; }
+
+.score-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.score-big {
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
+  font-weight: 900;
+  line-height: 1;
+}
+.score-big span { font-size: 1.1rem; font-weight: 700; color: var(--brown); }
+
+.score-pill {
+  display: inline-flex; align-items: center;
+  padding: 0.3rem 0.9rem;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: var(--border);
+  border-radius: 99px;
+  color: var(--white);
+}
+.pill-excellent { background: #4C7A4C; }
+.pill-good      { background: var(--terra); color: var(--near-black); }
+.pill-fair      { background: var(--golden); color: var(--near-black); }
+.pill-weak      { background: var(--near-black); }
+
+.type-tag {
+  display: inline-flex; align-items: center;
+  padding: 0.3rem 0.85rem;
+  background: var(--golden);
+  color: var(--near-black);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  border: var(--border);
+  border-radius: 99px;
+}
+
+/* ── Breakdown bars ─────────────────────────────────────── */
+.breakdown { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+
+.bar-row { display: flex; align-items: center; gap: 12px; }
+
+.bar-label {
+  flex: 0 0 130px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--near-black);
+}
+
+.bar-track {
+  flex: 1;
+  height: 14px;
+  background: var(--sand);
+  border: 2px solid var(--near-black);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  background: var(--terra);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+.bar-val {
+  flex: 0 0 46px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--brown);
+  text-align: right;
+}
+
+/* ── Stats row ──────────────────────────────────────────── */
+.stats-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.stat-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0.3rem 0.75rem;
+  background: var(--sand);
+  border: 2px solid var(--near-black);
+  border-radius: 99px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--near-black);
+}
+.stat-chip b { font-weight: 900; }
+
+/* ── Tips ───────────────────────────────────────────────── */
+.tips-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: var(--near-black);
+}
+
+.tip-item {
+  display: flex;
+  gap: 8px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--near-black);
+  margin-bottom: 6px;
+}
+.tip-item::before { content: '→'; color: var(--terra); font-weight: 700; flex-shrink: 0; }
+
+.no-tips { font-size: 14px; color: var(--brown); }
+
+/* ── Compare grid ───────────────────────────────────────── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.compare-card {
+  position: relative;
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--near-black);
+  padding: 22px;
+}
+.compare-card.winner {
+  border-color: var(--terra);
+  box-shadow: var(--shadow-terra);
+}
+
+.winner-badge {
+  position: absolute;
+  top: -12px; right: 16px;
+  background: var(--terra);
+  color: var(--near-black);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.7rem;
+  border: 2.5px solid var(--near-black);
+  border-radius: 99px;
+}
+
+.compare-headline {
+  font-size: 15px;
+  font-weight: 800;
+  line-height: 1.4;
+  margin-bottom: 14px;
+  word-break: break-word;
+  min-height: 2.8em;
+}
+
+.compare-score {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.compare-score .num { font-size: 2rem; font-weight: 900; }
+.compare-score .max { font-size: 0.9rem; font-weight: 700; color: var(--brown); }
+
+.compare-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--brown);
+}
+.compare-stats span {
+  border: 1.5px solid var(--near-black);
+  border-radius: 99px;
+  padding: 0.15rem 0.55rem;
+  color: var(--near-black);
+}
+
+/* ── Mobile ─────────────────────────────────────────────── */
+@media (max-width: 620px) {
+  .wrap { padding: 40px 24px 60px; }
+  .bar-label { flex-basis: 100px; }
+}
+</style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1>Headline Analyzer</h1>
+    <p class="subtitle">Score your headline for power, emotion, length, and readability before you hit publish.</p>
+  </header>
+
+  <div class="info-card">
+    <p>This tool scores a single headline — or several variants side by side — the way an editor would: word balance, emotional pull, length, and readability, rolled into a score out of 100. Use it on blog titles, email subject lines, ad copy, landing page headers, or social captions. Everything runs in your browser; nothing is saved or sent anywhere.</p>
+  </div>
+
+  <div class="input-card">
+    <div class="mode-row">
+      <div class="mode-picker" role="group" aria-label="Mode">
+        <button class="mode-btn active" data-mode="single">Single</button>
+        <button class="mode-btn" data-mode="compare">Compare</button>
+      </div>
+      <button class="clear-btn" onclick="clearAll()">Clear</button>
+    </div>
+
+    <div id="headline-list"></div>
+
+    <button class="add-btn" id="addBtn" style="display:none" onclick="addHeadline()">+ Add headline</button>
+  </div>
+
+  <div class="section-row">
+    <span class="sec-tag">Analysis</span>
+  </div>
+
+  <div id="results"></div>
+
+</div>
+
+<script>
+/* ---------------------------------------------------------
+   Word lists
+--------------------------------------------------------- */
+const POWER = new Set([
+  'free','proven','secret','secrets','ultimate','essential','exclusive','guaranteed','guarantee',
+  'instantly','instant','powerful','easy','effortless','effortlessly','simple','quick','fast',
+  'amazing','incredible','unbelievable','remarkable','extraordinary','revolutionary','breakthrough',
+  'discover','unlock','unleash','boost','save','savings','limited','bonus','hack','hacks','hidden',
+  'insider','master','mastering','transform','definitive','complete','comprehensive','critical',
+  'urgent','warning','alert','dangerous','shocking','surprising','stunning','secretly','banned',
+  'forbidden','controversial','exposed','unlimited','riskfree','foolproof','killer','epic',
+  'legendary','proven','stepbystep'
+]);
+
+const POSITIVE = new Set([
+  'love','best','amazing','awesome','great','wonderful','fantastic','happy','joy','excited',
+  'exciting','beautiful','brilliant','perfect','delightful','inspiring','inspire','success',
+  'successful','win','winning','triumph','victory','thrive','thriving','positive','uplifting',
+  'empower','empowering','celebrate','celebration','glorious','magical','charming','stunning',
+  'gorgeous','fun','energizing','refreshing','rewarding','satisfying','fulfilling','blessed',
+  'grateful','gratitude','hope','hopeful','proud','delicious','flawless'
+]);
+
+const NEGATIVE = new Set([
+  'worst','fail','failure','mistake','mistakes','danger','dangerous','warning','scary','fear',
+  'afraid','shocking','sad','angry','hate','terrible','horrible','awful','disaster','crisis',
+  'broken','wrong','problem','problems','struggle','struggling','painful','pain','dying','dead',
+  'death','deadly','toxic','ruin','ruined','lost','losing','loser','regret','nightmare','tragic',
+  'tragedy','panic','stress','stressed','anxiety','worried','worry','alarming','brutal','harsh',
+  'crush','crushed','devastating','disturbing'
+]);
+
+const STOP = new Set([
+  'a','an','the','of','to','in','on','at','for','with','and','or','but','is','are','was','were',
+  'be','been','being','this','that','these','those','it','its','as','by','from','into','about',
+  'than','then','so','if','when','while','your','you','we','our','us','i','my','me','he','she',
+  'they','them','his','her','their','do','does','did','not','no','yes','can','could','will',
+  'would','should','just','more','most','some','any','all','each','every','other','such','only',
+  'own','same','too','very','also','up','down','out','over','under','again','once','here','there'
+]);
+
+/* ---------------------------------------------------------
+   State
+--------------------------------------------------------- */
+let mode = 'single';
+let ids  = [0];
+let nextId = 1;
+const values = {};
+
+const listEl    = document.getElementById('headline-list');
+const addBtn    = document.getElementById('addBtn');
+const resultsEl = document.getElementById('results');
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+    addBtn.style.display = mode === 'compare' ? 'block' : 'none';
+    if (mode === 'compare' && ids.length < 2) addHeadline();
+    render();
+  });
+});
+
+/* ---------------------------------------------------------
+   Row management
+--------------------------------------------------------- */
+function buildRows() {
+  listEl.innerHTML = '';
+  ids.forEach((id, i) => {
+    const row = document.createElement('div');
+    row.className = 'headline-row';
+    row.dataset.id = id;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'headline-input';
+    input.placeholder = mode === 'compare' ? `Headline variant ${i + 1}…` : 'Type your headline here…';
+    input.autocomplete = 'off';
+    input.spellcheck = false;
+    input.value = values[id] || '';
+    input.addEventListener('input', () => { values[id] = input.value; render(); });
+    row.appendChild(input);
+
+    if (mode === 'compare' && ids.length > 2) {
+      const rm = document.createElement('button');
+      rm.className = 'remove-btn';
+      rm.type = 'button';
+      rm.textContent = '×';
+      rm.addEventListener('click', () => {
+        ids = ids.filter(x => x !== id);
+        buildRows();
+        render();
+      });
+      row.appendChild(rm);
+    }
+
+    listEl.appendChild(row);
+  });
+  addBtn.disabled = ids.length >= 5;
+}
+
+function addHeadline() {
+  if (ids.length >= 5) return;
+  ids.push(nextId++);
+  buildRows();
+  render();
+}
+
+function getValues() {
+  return [...listEl.querySelectorAll('.headline-input')].map(i => i.value);
+}
+
+function clearAll() {
+  ids = [0];
+  nextId = 1;
+  for (const k in values) delete values[k];
+  buildRows();
+  render();
+}
+
+buildRows();
+
+/* ---------------------------------------------------------
+   Analysis engine
+--------------------------------------------------------- */
+function countSyllables(word) {
+  let w = word.toLowerCase().replace(/[^a-z]/g, '');
+  if (!w) return 1;
+  w = w.replace(/e$/, '');
+  const m = w.match(/[aeiouy]+/g);
+  return m ? Math.max(1, m.length) : 1;
+}
+
+function fleschKincaidGrade(text, words) {
+  const sentences = Math.max(1, (text.match(/[.!?]+/g) || []).length);
+  const wc = Math.max(1, words.length);
+  const syllables = words.reduce((s, w) => s + countSyllables(w), 0);
+  const grade = 0.39 * (wc / sentences) + 11.8 * (syllables / wc) - 15.59;
+  return Math.max(0, grade);
+}
+
+function detectType(text) {
+  const t = text.trim();
+  if (/^\d+/.test(t) || /\b\d+\s+(ways|reasons|tips|things|secrets|steps|ideas|facts|mistakes|rules|habits|lessons)\b/i.test(t)) return 'List';
+  if (/^how to\b/i.test(t)) return 'How-To';
+  if (/\?$/.test(t)) return 'Question';
+  if (/\bvs\.?\b|\bversus\b/i.test(t)) return 'Comparison';
+  if (/^(why|what|when|where|who)\b/i.test(t)) return 'Explainer';
+  return 'Statement';
+}
+
+function scoreMeta(score) {
+  if (score >= 80) return { label: 'Excellent', pill: 'pill-excellent' };
+  if (score >= 65) return { label: 'Good',      pill: 'pill-good' };
+  if (score >= 45) return { label: 'Fair',      pill: 'pill-fair' };
+  return               { label: 'Weak',      pill: 'pill-weak' };
+}
+
+function clamp(n, lo, hi) { return Math.max(lo, Math.min(hi, n)); }
+
+function analyze(text) {
+  const trimmed = text.trim();
+  const words = trimmed.match(/[A-Za-z0-9'’-]+/g) || [];
+  const wordCount = words.length;
+  const charCount = trimmed.length;
+
+  const tagged = words.map(w => {
+    const lw = w.toLowerCase().replace(/['’]/g, '');
+    let type = 'uncommon';
+    if (POWER.has(lw)) type = 'power';
+    else if (POSITIVE.has(lw)) type = 'positive';
+    else if (NEGATIVE.has(lw)) type = 'negative';
+    else if (STOP.has(lw)) type = 'common';
+    return { word: w, type };
+  });
+
+  const powerCount = tagged.filter(t => t.type === 'power').length;
+  const posCount   = tagged.filter(t => t.type === 'positive').length;
+  const negCount   = tagged.filter(t => t.type === 'negative').length;
+  const commonCount = tagged.filter(t => t.type === 'common').length;
+  const uncommonCount = tagged.filter(t => t.type === 'uncommon').length;
+  const emotionalCount = posCount + negCount;
+
+  if (wordCount === 0) {
+    return null;
+  }
+
+  /* Word balance — 25 */
+  const idealCountScore = clamp(12 - Math.abs(wordCount - 8) * 1.4, 0, 12);
+  const hasPowerScore = powerCount > 0 ? 7 : 0;
+  const uncommonRatio = uncommonCount / wordCount;
+  const uncommonScore = clamp(6 - Math.abs(uncommonRatio - 0.3) * 18, 0, 6);
+  const wordBalanceScore = clamp(idealCountScore + hasPowerScore + uncommonScore, 0, 25);
+
+  /* Emotional value — 25 */
+  const emoRatio = emotionalCount / wordCount;
+  const emotionalScore = clamp(25 - Math.abs(emoRatio - 0.15) * 100, 0, 25);
+
+  /* Length — 25 (char count) */
+  let lengthScore;
+  if (charCount >= 30 && charCount <= 60) lengthScore = 25;
+  else if (charCount < 30) lengthScore = clamp(25 - (30 - charCount) * 1.2, 0, 25);
+  else lengthScore = clamp(25 - (charCount - 60) * 0.6, 0, 25);
+
+  /* Readability — 15 */
+  const grade = fleschKincaidGrade(trimmed, words);
+  let readabilityScore;
+  if (grade <= 6) readabilityScore = 15;
+  else if (grade <= 8) readabilityScore = 12;
+  else if (grade <= 10) readabilityScore = 8;
+  else if (grade <= 12) readabilityScore = 4;
+  else readabilityScore = 1;
+
+  /* Sentiment — 10 */
+  let sentimentScore, sentimentLabel;
+  if (posCount > 0 && negCount === 0) { sentimentScore = 10; sentimentLabel = 'Positive'; }
+  else if (negCount > 0 && posCount === 0) { sentimentScore = 9; sentimentLabel = 'Negative'; }
+  else if (posCount > 0 && negCount > 0) { sentimentScore = 6; sentimentLabel = 'Mixed'; }
+  else { sentimentScore = 3; sentimentLabel = 'Neutral'; }
+
+  const total = Math.round(wordBalanceScore + emotionalScore + lengthScore + readabilityScore + sentimentScore);
+  const type = detectType(trimmed);
+
+  /* Tips */
+  const tips = [];
+  if (wordCount < 5) tips.push('Add more context — headlines under 5 words often feel vague.');
+  if (wordCount > 14) tips.push('Trim it down — headlines over 14 words lose readers fast.');
+  if (charCount > 70) tips.push('Keep it under 70 characters so it isn’t cut off in search results.');
+  if (powerCount === 0) tips.push('Add a power word (proven, essential, ultimate) to boost pull.');
+  if (emotionalCount === 0) tips.push('Give it an emotional edge — try a word like amazing, shocking, or powerful.');
+  if (grade > 10) tips.push(`Simplify your language — this reads at roughly a grade ${grade.toFixed(1)} level.`);
+  if (!/\d/.test(trimmed)) tips.push('Consider a specific number — numbers boost click potential.');
+
+  return {
+    text: trimmed, tagged, wordCount, charCount, grade, type, total,
+    powerCount, emotionalCount, sentimentLabel,
+    breakdown: {
+      wordBalance: wordBalanceScore, emotional: emotionalScore,
+      length: lengthScore, readability: readabilityScore, sentiment: sentimentScore
+    },
+    tips: tips.slice(0, 4)
+  };
+}
+
+/* ---------------------------------------------------------
+   Render
+--------------------------------------------------------- */
+function render() {
+  const values = getValues().map(v => v.trim()).filter(Boolean);
+
+  if (!values.length) {
+    resultsEl.innerHTML = `<div class="empty-card">${mode === 'compare' ? 'Type two or more headlines above to compare their scores.' : 'Type a headline above to see its score.'}</div>`;
+    return;
+  }
+
+  if (mode === 'single') {
+    const r = analyze(values[0]);
+    resultsEl.innerHTML = renderSingle(r);
+  } else {
+    const results = values.map(v => analyze(v)).filter(Boolean);
+    if (results.length < 2) {
+      resultsEl.innerHTML = `<div class="empty-card">Add at least one more headline to compare.</div>`;
+      return;
+    }
+    const maxScore = Math.max(...results.map(r => r.total));
+    resultsEl.innerHTML = `<div class="compare-grid">${results.map(r => renderCompareCard(r, r.total === maxScore)).join('')}</div>`;
+  }
+}
+
+function highlightHTML(tagged) {
+  return tagged.map(t => {
+    const esc = t.word.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    if (t.type === 'power') return `<span class="hl-power">${esc}</span>`;
+    if (t.type === 'positive') return `<span class="hl-positive">${esc}</span>`;
+    if (t.type === 'negative') return `<span class="hl-negative">${esc}</span>`;
+    return esc;
+  }).join(' ');
+}
+
+function renderSingle(r) {
+  const meta = scoreMeta(r.total);
+  const b = r.breakdown;
+  const bars = [
+    ['Word Balance', b.wordBalance, 25],
+    ['Emotional Value', b.emotional, 25],
+    ['Length', b.length, 25],
+    ['Readability', b.readability, 15],
+    ['Sentiment', b.sentiment, 10]
+  ];
+
+  return `
+  <div class="output-card">
+    <div class="headline-preview">${highlightHTML(r.tagged)}</div>
+
+    <div class="score-head">
+      <div class="score-big">${r.total}<span>/100</span></div>
+      <span class="score-pill ${meta.pill}">${meta.label}</span>
+      <span class="type-tag">${r.type}</span>
+    </div>
+
+    <div class="breakdown">
+      ${bars.map(([label, val, max]) => `
+        <div class="bar-row">
+          <span class="bar-label">${label}</span>
+          <div class="bar-track"><div class="bar-fill" style="width:${(val / max) * 100}%"></div></div>
+          <span class="bar-val">${val.toFixed(0)}/${max}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="stats-row">
+      <span class="stat-chip"><b>${r.wordCount}</b>&nbsp;words</span>
+      <span class="stat-chip"><b>${r.charCount}</b>&nbsp;characters</span>
+      <span class="stat-chip">Grade&nbsp;<b>${r.grade.toFixed(1)}</b></span>
+      <span class="stat-chip"><b>${r.powerCount}</b>&nbsp;power word${r.powerCount === 1 ? '' : 's'}</span>
+      <span class="stat-chip">Tone:&nbsp;<b>${r.sentimentLabel}</b></span>
+    </div>
+
+    <div class="tips-title">Tips</div>
+    ${r.tips.length
+      ? r.tips.map(t => `<div class="tip-item">${t}</div>`).join('')
+      : `<div class="no-tips">Solid headline — no major issues detected.</div>`}
+  </div>`;
+}
+
+function renderCompareCard(r, isWinner) {
+  return `
+  <div class="compare-card ${isWinner ? 'winner' : ''}">
+    ${isWinner ? '<span class="winner-badge">Winner</span>' : ''}
+    <div class="compare-headline">${highlightHTML(r.tagged)}</div>
+    <div class="compare-score"><span class="num">${r.total}</span><span class="max">/100</span></div>
+    <div class="compare-stats">
+      <span>${r.wordCount} words</span>
+      <span>${r.charCount} chars</span>
+      <span>${r.type}</span>
+      <span>${r.sentimentLabel}</span>
+    </div>
+  </div>`;
+}
+
+render();
+</script>
+</body>
+</html>

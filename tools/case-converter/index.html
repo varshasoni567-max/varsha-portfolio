@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case Converter</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand:       #F7F4EC;
+  --terra:      #D69C8C;
+  --sage:       #131210;
+  --golden:     #F0C9BA;
+  --near-black: #131210;
+  --brown:      #6B6558;
+  --white:      #FFFFFF;
+  --border:     2px solid #131210;
+  --shadow-black:  4px 4px 0 #131210;
+  --shadow-terra:  4px 4px 0 #D69C8C;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--sand);
+  color: var(--near-black);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 3.5rem 2rem 5rem;
+}
+
+header { margin-bottom: 2.5rem; }
+
+h1 {
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: var(--near-black);
+}
+
+.subtitle {
+  margin-top: 0.5rem;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--brown);
+}
+
+.input-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-black);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+
+textarea {
+  display: block;
+  width: 100%;
+  min-height: 140px;
+  padding: 0.75rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.65;
+  color: var(--near-black);
+  background: var(--sand);
+  border: var(--border);
+  border-radius: 8px;
+  resize: vertical;
+  outline: none;
+  transition: box-shadow 0.15s;
+}
+
+textarea:focus { box-shadow: 3px 3px 0 var(--terra); }
+
+textarea::placeholder { color: var(--brown); opacity: 0.6; }
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.75rem;
+}
+
+.detected {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  background: var(--sage);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  border: var(--border);
+  border-radius: 99px;
+  visibility: hidden;
+}
+
+.detected.show { visibility: visible; }
+
+.stats {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--brown);
+  letter-spacing: 0.02em;
+}
+
+.clear-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 1.1rem;
+  border: var(--border);
+  border-radius: 99px;
+  background: var(--terra);
+  color: var(--near-black);
+  cursor: pointer;
+  transition: box-shadow 0.12s, transform 0.1s;
+}
+
+.clear-btn:hover { box-shadow: var(--shadow-black); transform: translate(-1px,-1px); }
+.clear-btn:active { box-shadow: none; transform: translate(2px,2px); }
+
+.section-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 1rem;
+  margin-bottom: 0.75rem;
+  margin-top: 2rem;
+}
+
+.sec-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  background: var(--sage);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: var(--border);
+  border-radius: 99px;
+}
+
+.unified-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: repeat(3, auto);
+  gap: 1rem;
+}
+
+.card {
+  position: relative;
+  padding: 1.1rem 1.25rem 1.25rem;
+  background: var(--white);
+  border: 2.5px solid var(--terra);
+  border-radius: 12px;
+  box-shadow: var(--shadow-terra);
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.card:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--terra); }
+
+.card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  gap: 0.5rem;
+}
+
+.card-label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--brown);
+  line-height: 1.2;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.7rem;
+  background: var(--golden);
+  border: var(--border);
+  border-radius: 99px;
+  cursor: pointer;
+  color: var(--near-black);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  gap: 0.3rem;
+  flex-shrink: 0;
+  transition: box-shadow 0.12s, transform 0.1s;
+}
+
+.copy-btn:hover { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px,-1px); }
+.copy-btn:active { box-shadow: none; transform: translate(1px,1px); }
+.copy-btn.ok { background: var(--sage); color: var(--white); }
+.copy-btn svg { flex-shrink: 0; }
+
+.card-out {
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.6;
+  color: var(--near-black);
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 1.5em;
+  user-select: text;
+}
+
+.card-out.empty::before { content: '—'; color: #ccc; font-weight: 400; }
+
+@media (max-width: 620px) {
+  .wrap { padding: 2rem 1rem 3.5rem; }
+  .section-row, .unified-grid { grid-template-columns: 1fr; }
+}
+</style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1>Case Converter</h1>
+    <p class="subtitle">Clean and fast text case conversion for everyday use.</p>
+  </header>
+
+  <div class="input-card">
+    <textarea id="input" placeholder="Type or paste text here." spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+    <div class="meta">
+      <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
+        <span class="stats" id="stats">0 words · 0 characters</span>
+        <div class="detected" id="detected">Detected: Sentence case</div>
+      </div>
+      <button class="clear-btn" onclick="clearAll()">Clear</button>
+    </div>
+  </div>
+
+  <div class="section-row">
+    <span class="sec-tag">Title Case</span>
+    <span class="sec-tag">Basic</span>
+  </div>
+
+  <div class="unified-grid">
+
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">AP Style</span>
+        <button class="copy-btn" onclick="copyCard(this,'out-ap')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="card-out empty" id="out-ap"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">Sentence case</span>
+        <button class="copy-btn" onclick="copyCard(this,'out-sentence')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="card-out empty" id="out-sentence"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">APA Style</span>
+        <button class="copy-btn" onclick="copyCard(this,'out-apa')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="card-out empty" id="out-apa"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">camelCase</span>
+        <button class="copy-btn" onclick="copyCard(this,'out-camel')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="card-out empty" id="out-camel"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">Chicago Style</span>
+        <button class="copy-btn" onclick="copyCard(this,'out-chicago')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="card-out empty" id="out-chicago"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-top">
+        <span class="card-label">kebab-case</span>
+        <button class="copy-btn" onclick="copyCard(this,'out-kebab')">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <div class="card-out empty" id="out-kebab"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+const inputEl  = document.getElementById('input');
+const statsEl  = document.getElementById('stats');
+const detected = document.getElementById('detected');
+
+inputEl.addEventListener('input', update);
+
+function update() {
+  const text    = inputEl.value;
+  const trimmed = text.trim();
+  const words = trimmed ? trimmed.split(/\s+/).length : 0;
+  const chars = text.length;
+  statsEl.textContent = `${words} ${words === 1 ? 'word' : 'words'} · ${chars} ${chars === 1 ? 'character' : 'characters'}`;
+  const det = detectCase(trimmed);
+  if (det) { detected.textContent = `Detected: ${det}`; detected.classList.add('show'); }
+  else { detected.classList.remove('show'); }
+  setOut('out-ap',       trimmed ? perLine(text, l => titleCase(l, 'ap'))      : '');
+  setOut('out-apa',      trimmed ? perLine(text, l => titleCase(l, 'apa'))     : '');
+  setOut('out-chicago',  trimmed ? perLine(text, l => titleCase(l, 'chicago')) : '');
+  setOut('out-sentence', trimmed ? toSentenceCase(text)                        : '');
+  setOut('out-camel',    trimmed ? perLine(text, toCamelCase)                  : '');
+  setOut('out-kebab',    trimmed ? perLine(text, toKebabCase)                  : '');
+}
+
+function setOut(id, val) {
+  const el = document.getElementById(id);
+  el.textContent = val;
+  el.classList.toggle('empty', !val);
+}
+
+function clearAll() { inputEl.value = ''; update(); inputEl.focus(); }
+
+function copyCard(btn, id) {
+  const text = document.getElementById(id).textContent;
+  if (!text) return;
+  const write = () => {
+    btn.classList.add('ok');
+    btn.textContent = '✓ Copied';
+    setTimeout(() => {
+      btn.classList.remove('ok');
+      btn.innerHTML = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy';
+    }, 1500);
+  };
+  navigator.clipboard.writeText(text).then(write).catch(() => {
+    const tmp = document.createElement('textarea');
+    tmp.value = text;
+    tmp.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+    write();
+  });
+}
+
+function detectCase(t) {
+  if (!t || !/[a-zA-Z]/.test(t)) return null;
+  const letters = t.replace(/[^a-zA-Z]/g, '');
+  if (letters === letters.toUpperCase()) return 'Upper case';
+  if (letters === letters.toLowerCase()) {
+    if (/^[a-z][a-z0-9]*(-[a-z0-9]+)+$/.test(t)) return 'kebab-case';
+    return 'Lower case';
+  }
+  if (!/[\s\-_]/.test(t) && /^[a-z]/.test(t) && /[A-Z]/.test(t)) return 'camelCase';
+  const words = t.split(/\s+/);
+  if (words.length > 1 && /^[A-Z]/.test(words[0]) && words[0].slice(1) === words[0].slice(1).toLowerCase() && words.slice(1).every(w => w === w.toLowerCase())) return 'Sentence case';
+  if (words.length > 1 && words.filter(w => /^[A-Z]/.test(w)).length / words.length >= 0.6) return 'Title case';
+  return null;
+}
+
+function perLine(text, fn) { return text.split('\n').map(l => l.trim() ? fn(l) : l).join('\n'); }
+
+function isAcronym(w) {
+  const core = w.replace(/^[^A-Za-z]+|[^A-Za-z]+$/g, '');
+  return core.length >= 2 && core === core.toUpperCase() && core !== core.toLowerCase();
+}
+
+function toSentenceCase(text) {
+  return text
+    .replace(/\S+/g, w => isAcronym(w) ? w : w.toLowerCase())
+    .replace(/(^\s*[a-z]|[.!?]\s+[a-z])/g, c => c.toUpperCase());
+}
+
+function toCamelCase(text) {
+  return text.trim().toLowerCase().replace(/[^a-z0-9]+([a-z0-9])/g, (_, c) => c.toUpperCase());
+}
+
+function toKebabCase(text) {
+  return text.trim().replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+}
+
+const AP_LOWER = new Set(['a','an','the','as','at','by','for','in','of','on','per','to','up','via','vs','and','but','nor','or','so','yet']);
+
+const ALL_PREPS = new Set(['about','above','across','after','against','along','amid','among','around','as','at','before','behind','below','beneath','beside','besides','between','beyond','by','concerning','despite','down','during','except','for','from','given','in','inside','into','like','minus','near','next','of','off','on','onto','opposite','out','outside','over','past','per','plus','pro','regarding','round','sans','save','since','than','through','throughout','till','times','to','toward','towards','under','underneath','unlike','until','up','upon','versus','via','vs','with','within','without']);
+
+const CHICAGO_LOWER = new Set(['a','an','the',...ALL_PREPS,'and','but','for','nor','or','so','yet']);
+
+function cap(w) {
+  if (isAcronym(w)) return w;
+  const s = w.toLowerCase();
+  return s[0].toUpperCase() + s.slice(1);
+}
+
+function titleCase(text, style) {
+  if (!text.trim()) return text;
+  const lower = style === 'chicago' ? CHICAGO_LOWER : AP_LOWER;
+  const tokens = text.split(/(\s+)/);
+  let first = -1, last = -1;
+  tokens.forEach((t, i) => { if (t.trim()) { if (first < 0) first = i; last = i; } });
+  return tokens.map((t, i) => {
+    if (!t.trim()) return t;
+    if (i === first || i === last) return cap(t);
+    return lower.has(t.toLowerCase()) ? t.toLowerCase() : cap(t);
+  }).join('');
+}
+</script>
+</body>
+</html>

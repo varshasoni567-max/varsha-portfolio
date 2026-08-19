@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Positioning Builder</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand:         #F7F4EC;
+  --terra:        #D69C8C;
+  --golden:       #F0C9BA;
+  --near-black:   #131210;
+  --brown:        #6B6558;
+  --white:        #FFFFFF;
+  --border:       2px solid #131210;
+  --shadow-black: 4px 4px 0 #131210;
+  --shadow-terra: 4px 4px 0 #D69C8C;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--sand);
+  color: var(--near-black);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 56px 40px 80px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+header { margin-bottom: 24px; }
+
+.page-title {
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
+
+.title-dark   { color: var(--near-black); }
+.title-accent { color: var(--terra); }
+
+.subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--brown);
+  line-height: 1.6;
+}
+
+/* ── Info card ──────────────────────────────────────────── */
+.info-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-black);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.info-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: none;
+  counter-reset: info-step;
+}
+
+.info-list li {
+  position: relative;
+  padding-left: 28px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--brown);
+  counter-increment: info-step;
+}
+
+.info-list li::before {
+  content: counter(info-step);
+  position: absolute;
+  left: 0;
+  top: 0.05em;
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--golden);
+  color: var(--near-black);
+  border: 1.5px solid var(--near-black);
+  border-radius: 50%;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.info-list strong { color: var(--near-black); }
+
+/* ── Framework tab strip ────────────────────────────────── */
+.fw-tab-strip {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.fw-tab {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 7px 18px;
+  border: var(--border);
+  border-radius: 99px;
+  background: transparent;
+  color: var(--near-black);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, box-shadow 0.12s, transform 0.1s;
+}
+
+.fw-tab:hover:not(.active) { background: var(--sand); }
+.fw-tab:hover:not(.active) { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px, -1px); }
+.fw-tab:active             { box-shadow: none; transform: translate(1px, 1px); }
+
+.fw-tab.active { background: var(--golden); }
+
+/* ── Input card ─────────────────────────────────────────── */
+.input-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-black);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+/* ── Card header ────────────────────────────────────────── */
+.card-top-inner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1.5px solid var(--sand);
+}
+
+.card-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+.example-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 6px 14px;
+  background: var(--near-black);
+  color: var(--golden);
+  border: var(--border);
+  border-radius: 99px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s, transform 0.1s;
+}
+
+.example-btn:hover  { opacity: 0.82; transform: translate(-1px, -1px); }
+.example-btn:active { transform: translate(1px, 1px); opacity: 1; }
+
+.clear-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 6px 14px;
+  border: var(--border);
+  border-radius: 99px;
+  background: var(--terra);
+  color: var(--near-black);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: box-shadow 0.12s, transform 0.1s;
+}
+
+.clear-btn:hover  { box-shadow: var(--shadow-black); transform: translate(-1px, -1px); }
+.clear-btn:active { box-shadow: none; transform: translate(2px, 2px); }
+
+.fw-card-desc {
+  flex: 1;
+  font-size: 14px;
+  color: var(--brown);
+  line-height: 1.6;
+  min-width: 0;
+}
+
+/* ── Field panels ───────────────────────────────────────── */
+.fw-fields[hidden] { display: none; }
+
+.card-section { padding-bottom: 24px; }
+
+.card-section + .card-section {
+  border-top: 1.5px solid var(--sand);
+  padding-top: 24px;
+}
+
+.section-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brown);
+  margin-bottom: 16px;
+}
+
+.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+.field { display: flex; flex-direction: column; gap: 4px; margin-bottom: 16px; }
+.field:last-child  { margin-bottom: 0; }
+.field-row .field  { margin-bottom: 0; }
+
+.field-label { font-size: 14px; font-weight: 700; color: var(--near-black); }
+
+.field-hint { font-size: 12px; color: var(--brown); line-height: 1.5; margin-bottom: 6px; }
+
+.text-input,
+.textarea-input {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  color: var(--near-black);
+  background: var(--sand);
+  border: var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  outline: none;
+  width: 100%;
+  line-height: 1.65;
+  transition: box-shadow 0.15s;
+}
+
+.textarea-input { resize: vertical; min-height: 76px; }
+
+.text-input::placeholder,
+.textarea-input::placeholder { color: var(--brown); opacity: 0.5; }
+
+.text-input:focus,
+.textarea-input:focus { box-shadow: 3px 3px 0 var(--terra); }
+
+/* ── Section row ────────────────────────────────────────── */
+.section-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 16px;
+}
+
+.sec-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  background: var(--near-black);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: var(--border);
+  border-radius: 99px;
+}
+
+/* ── Preview card ───────────────────────────────────────── */
+.preview-card {
+  background: var(--white);
+  border: 2.5px solid var(--terra);
+  border-radius: 12px;
+  box-shadow: var(--shadow-terra);
+  overflow: hidden;
+  margin-bottom: 0;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.preview-card:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 var(--terra); }
+
+.preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 32px;
+  border-bottom: 2px solid var(--sand);
+}
+
+.preview-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brown);
+}
+
+/* ── Copy button ────────────────────────────────────────── */
+.copy-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
+  background: var(--golden);
+  border: var(--border);
+  border-radius: 99px;
+  cursor: pointer;
+  color: var(--near-black);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  flex-shrink: 0;
+  transition: box-shadow 0.12s, transform 0.1s;
+}
+
+.copy-btn:hover  { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px, -1px); }
+.copy-btn:active { box-shadow: none; transform: translate(1px, 1px); }
+.copy-btn.ok     { background: #7B9E7B; color: var(--white); border-color: var(--near-black); }
+.copy-btn svg    { flex-shrink: 0; }
+
+/* ── Statement area ─────────────────────────────────────── */
+.statement-area { background: var(--golden); padding: 32px; }
+.statement-text { font-size: 17px; line-height: 2; color: var(--near-black); }
+.slot-filled    { font-weight: 700; }
+.slot-empty     { color: var(--brown); opacity: 0.45; font-style: italic; }
+
+/* ── Mobile ─────────────────────────────────────────────── */
+@media (max-width: 620px) {
+  .wrap         { padding: 40px 24px 60px; }
+  .field-row    { grid-template-columns: 1fr; }
+  .fw-tab-strip { flex-wrap: wrap; }
+  .card-top-inner { align-items: flex-start; }
+}
+</style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1 class="page-title">
+      <span class="title-dark">Positioning</span> <span class="title-accent">Builder</span>
+    </h1>
+    <p class="subtitle">Turn a few plain-language answers into a ready-to-use positioning statement.</p>
+  </header>
+
+  <div class="info-card">
+    <ol class="info-list">
+      <li><strong>Positioning</strong> is the short answer to "who's this for, and why pick it over what they use today."</li>
+      <li>Answer a few plain-language questions about your product, customer, and competitor.</li>
+      <li>Get a finished statement — worded the way your chosen framework builds it. Switch frameworks and the argument itself changes, not just the wording.</li>
+    </ol>
+  </div>
+
+  <!-- Framework tab strip -->
+  <div class="fw-tab-strip" role="tablist">
+    <button class="fw-tab active" data-fw="moore"   role="tab">Geoffrey Moore</button>
+    <button class="fw-tab"        data-fw="dunford" role="tab">April Dunford</button>
+    <button class="fw-tab"        data-fw="blank"   role="tab">Steve Blank</button>
+  </div>
+
+  <!-- Input card -->
+  <div class="input-card" id="input-card">
+
+    <div class="card-top-inner">
+      <div class="card-actions">
+        <button class="example-btn" onclick="loadExample()">Load example</button>
+        <button class="clear-btn"   onclick="clearAll()">Clear</button>
+      </div>
+      <p class="fw-card-desc" id="fw-card-desc">The classic. Seven specific slots; fill them and a clear statement falls out. Best for B2B and enterprise — when you need to spell out segment, category, and competitor explicitly.</p>
+    </div>
+
+    <!-- ══ MOORE ══════════════════════════════════ -->
+    <div id="fw-moore" class="fw-fields">
+
+      <div class="card-section">
+        <p class="section-eyebrow">Your product</p>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="m_product">Product name</label>
+            <p class="field-hint">The name you'd use in a headline.</p>
+            <input type="text" id="m_product" class="text-input" placeholder="e.g. Notion, Figma, Scalekit" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="field-label" for="m_category">Market category</label>
+            <p class="field-hint">The space it competes in.</p>
+            <input type="text" id="m_category" class="text-input" placeholder="e.g. connected workspace, B2B auth platform" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <p class="section-eyebrow">Your customer</p>
+        <div class="field">
+          <label class="field-label" for="m_customer">Target customer</label>
+          <p class="field-hint">Who specifically this is for — be as narrow as useful.</p>
+          <input type="text" id="m_customer" class="text-input" placeholder="e.g. B2B SaaS teams, early-stage founders, ops managers" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="field-label" for="m_need">Pain or need</label>
+          <p class="field-hint">The core problem they're trying to solve.</p>
+          <textarea id="m_need" class="textarea-input" placeholder="e.g. spend too much time switching between scattered tools to get things done"></textarea>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <p class="section-eyebrow">Your solution</p>
+        <div class="field">
+          <label class="field-label" for="m_benefit">Key benefit</label>
+          <p class="field-hint">The primary outcome your product delivers — not a feature, a result.</p>
+          <textarea id="m_benefit" class="textarea-input" placeholder="e.g. connects notes, wikis, docs, and tasks in one flexible system the whole team can shape"></textarea>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <p class="section-eyebrow">Competitive context</p>
+        <div class="field">
+          <label class="field-label" for="m_competitor">Current alternative</label>
+          <p class="field-hint">What they use today instead of you — a tool, a process, or doing nothing.</p>
+          <input type="text" id="m_competitor" class="text-input" placeholder="e.g. separate apps for docs, tasks, and wikis" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="field-label" for="m_differentiator">Key differentiator</label>
+          <p class="field-hint">The one thing you do that the alternative cannot match.</p>
+          <textarea id="m_differentiator" class="textarea-input" placeholder="e.g. gives every team one customisable system that actually fits how they work"></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ DUNFORD ═════════════════════════════════ -->
+    <div id="fw-dunford" class="fw-fields" hidden>
+
+      <div class="card-section">
+        <p class="section-eyebrow">Product &amp; category</p>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="d_product">Product name</label>
+            <p class="field-hint">The name you'd use in a headline.</p>
+            <input type="text" id="d_product" class="text-input" placeholder="e.g. Notion, Figma, Scalekit" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="field-label" for="d_category">Market category</label>
+            <p class="field-hint">The frame that makes your value instantly obvious to buyers.</p>
+            <input type="text" id="d_category" class="text-input" placeholder="e.g. connected workspace, revenue intelligence platform" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <p class="section-eyebrow">Target customer</p>
+        <div class="field">
+          <label class="field-label" for="d_customer">Who they are</label>
+          <p class="field-hint">The specific segment who cares most about what you uniquely do.</p>
+          <input type="text" id="d_customer" class="text-input" placeholder="e.g. ops teams drowning in tool sprawl, mid-market RevOps leads" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="field-label" for="d_outcome">The value they need</label>
+          <p class="field-hint">The business outcome they're trying to reach — not a feature, the end result.</p>
+          <textarea id="d_outcome" class="textarea-input" placeholder="e.g. one system where all their work lives, without re-training the whole team"></textarea>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <p class="section-eyebrow">Competitive context</p>
+        <div class="field">
+          <label class="field-label" for="d_alternative">Competitive alternative</label>
+          <p class="field-hint">What they'd use if you didn't exist — a product, a spreadsheet, or nothing.</p>
+          <input type="text" id="d_alternative" class="text-input" placeholder="e.g. a patchwork of best-of-breed apps, manual spreadsheet tracking" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="field-label" for="d_capability">Your unique capability</label>
+          <p class="field-hint">What you do that the alternative structurally cannot — the attribute that drives your value.</p>
+          <textarea id="d_capability" class="textarea-input" placeholder="e.g. unifies notes, wikis, tasks, and databases in a single fully customisable space"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="d_cost">What they currently put up with</label>
+          <p class="field-hint">The tax or friction the alternative forces on them — the cost you eliminate.</p>
+          <textarea id="d_cost" class="textarea-input" placeholder="e.g. constant context-switching, duplicated information, and stitching tools together manually"></textarea>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ══ BLANK ═══════════════════════════════════ -->
+    <div id="fw-blank" class="fw-fields" hidden>
+
+      <div class="card-section">
+        <p class="section-eyebrow">Who &amp; what</p>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="b_product">Product name</label>
+            <p class="field-hint">The name you'd use in a headline.</p>
+            <input type="text" id="b_product" class="text-input" placeholder="e.g. Notion, Figma, Scalekit" autocomplete="off">
+          </div>
+          <div class="field">
+            <label class="field-label" for="b_customer">Target customer</label>
+            <p class="field-hint">Who uses this and benefits most.</p>
+            <input type="text" id="b_customer" class="text-input" placeholder="e.g. knowledge workers, B2B SaaS teams, ops managers" autocomplete="off">
+          </div>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <p class="section-eyebrow">The job</p>
+        <div class="field">
+          <label class="field-label" for="b_job">Job to be done</label>
+          <p class="field-hint">What they're trying to accomplish — the goal, not the feature.</p>
+          <textarea id="b_job" class="textarea-input" placeholder="e.g. get structured work done without losing context across tools"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="b_approach">How you help</label>
+          <p class="field-hint">Your method, capability, or mechanism that gets them to that goal.</p>
+          <textarea id="b_approach" class="textarea-input" placeholder="e.g. consolidating notes, docs, tasks, and databases into one adaptable workspace"></textarea>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <p class="section-eyebrow">Against alternatives</p>
+        <div class="field">
+          <label class="field-label" for="b_alternative">Current alternative</label>
+          <p class="field-hint">What they use today instead — tool, process, or workaround.</p>
+          <input type="text" id="b_alternative" class="text-input" placeholder="e.g. juggling Confluence, Jira, Google Docs, and Asana separately" autocomplete="off">
+        </div>
+        <div class="field">
+          <label class="field-label" for="b_gap">Why it falls short</label>
+          <p class="field-hint">The specific thing the alternative fails to deliver.</p>
+          <textarea id="b_gap" class="textarea-input" placeholder="e.g. creates context-switching that fragments focus and slows teams down"></textarea>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <p class="section-eyebrow">The result</p>
+        <div class="field">
+          <label class="field-label" for="b_outcome">Key outcome</label>
+          <p class="field-hint">The measurable or meaningful result of using your product.</p>
+          <textarea id="b_outcome" class="textarea-input" placeholder="e.g. more time on actual work, less time managing tools and bridging information gaps"></textarea>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /#input-card -->
+
+  <!-- Output section -->
+  <div class="section-row">
+    <span class="sec-tag">Your positioning</span>
+  </div>
+
+  <div class="preview-card">
+    <div class="preview-header">
+      <span class="preview-eyebrow" id="preview-eyebrow">Geoffrey Moore &mdash; Live preview</span>
+      <button class="copy-btn" id="copy-btn" onclick="copyStatement()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="9" y="9" width="13" height="13" rx="2"/>
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+        </svg>
+        Copy
+      </button>
+    </div>
+    <div class="statement-area">
+      <p class="statement-text" id="preview"></p>
+    </div>
+  </div>
+
+</div><!-- /.wrap -->
+
+<script>
+/* ─── State ───────────────────────────────────── */
+let activeFw = 'moore';
+
+/* ─── Helpers ─────────────────────────────────── */
+function esc(s) {
+  return String(s ?? '')
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function get(id) {
+  const el = document.getElementById(id);
+  return el ? el.value.trim() : '';
+}
+
+function slot(id, label) {
+  const val = get(id);
+  return val
+    ? `<span class="slot-filled">${esc(val)}</span>`
+    : `<span class="slot-empty">[${label}]</span>`;
+}
+
+/* ─── Tab switching ───────────────────────────── */
+const EYEBROWS = {
+  moore:   'Geoffrey Moore — Live preview',
+  dunford: 'April Dunford — Live preview',
+  blank:   'Steve Blank — Live preview',
+};
+
+const FW_DESCS = {
+  moore:   'The classic. Seven specific slots; fill them and a clear statement falls out. Best for B2B and enterprise — when you need to spell out segment, category, and competitor explicitly.',
+  dunford: 'Start from competitive alternatives. Let the right category emerge from your unique capability. Best for crowded markets, pivots, or when you\'re unsure what category you\'re really competing in.',
+  blank:   'Short and action-oriented. Job-to-be-done framing. Fast to fill and easy to iterate. Best for early-stage startups still finding product-market fit or anyone who needs a first draft fast.',
+};
+
+function switchTab(fw) {
+  activeFw = fw;
+
+  document.querySelectorAll('.fw-tab').forEach(t =>
+    t.classList.toggle('active', t.dataset.fw === fw)
+  );
+
+  document.querySelectorAll('.fw-fields').forEach(el => {
+    el.id === `fw-${fw}` ? el.removeAttribute('hidden') : el.setAttribute('hidden', '');
+  });
+
+  document.getElementById('fw-card-desc').textContent = FW_DESCS[fw];
+  document.getElementById('preview-eyebrow').textContent = EYEBROWS[fw];
+  buildPreview();
+}
+
+document.querySelectorAll('.fw-tab').forEach(btn =>
+  btn.addEventListener('click', () => switchTab(btn.dataset.fw))
+);
+
+/* ─── Preview templates ───────────────────────── */
+function buildMoore() {
+  return (
+    `For ${slot('m_customer', 'target customer')} ` +
+    `who ${slot('m_need', 'pain or need')}, ` +
+    `${slot('m_product', 'product name')} ` +
+    `is a ${slot('m_category', 'market category')} ` +
+    `that ${slot('m_benefit', 'key benefit')}. ` +
+    `Unlike ${slot('m_competitor', 'current alternative')}, ` +
+    `${slot('m_product', 'product name')} ` +
+    `${slot('m_differentiator', 'key differentiator')}.`
+  );
+}
+
+function buildDunford() {
+  return (
+    `${slot('d_product', 'product name')} ` +
+    `is the ${slot('d_category', 'market category')} ` +
+    `for ${slot('d_customer', 'target customer')} ` +
+    `who need ${slot('d_outcome', 'key value or outcome')}. ` +
+    `Unlike ${slot('d_alternative', 'competitive alternative')}, ` +
+    `${slot('d_product', 'product name')} ` +
+    `${slot('d_capability', 'unique capability')} ` +
+    `— without ${slot('d_cost', 'cost of alternatives')}.`
+  );
+}
+
+function buildBlank() {
+  return (
+    `${slot('b_product', 'product name')} ` +
+    `helps ${slot('b_customer', 'target customer')} ` +
+    `${slot('b_job', 'job to be done')} ` +
+    `by ${slot('b_approach', 'how you help')}. ` +
+    `Unlike ${slot('b_alternative', 'current alternative')} ` +
+    `— which ${slot('b_gap', 'why it falls short')} ` +
+    `— ${slot('b_product', 'product name')} ` +
+    `delivers ${slot('b_outcome', 'key outcome')}.`
+  );
+}
+
+function buildPreview() {
+  const builders = { moore: buildMoore, dunford: buildDunford, blank: buildBlank };
+  document.getElementById('preview').innerHTML = builders[activeFw]();
+}
+
+/* ─── Copy ────────────────────────────────────── */
+const PLAIN_TEMPLATES = {
+  moore: () => {
+    const g = id => get(id) || `[${id}]`;
+    return `For ${g('m_customer')} who ${g('m_need')}, ${g('m_product')} is a ${g('m_category')} that ${g('m_benefit')}. Unlike ${g('m_competitor')}, ${g('m_product')} ${g('m_differentiator')}.`;
+  },
+  dunford: () => {
+    const g = id => get(id) || `[${id}]`;
+    return `${g('d_product')} is the ${g('d_category')} for ${g('d_customer')} who need ${g('d_outcome')}. Unlike ${g('d_alternative')}, ${g('d_product')} ${g('d_capability')} — without ${g('d_cost')}.`;
+  },
+  blank: () => {
+    const g = id => get(id) || `[${id}]`;
+    return `${g('b_product')} helps ${g('b_customer')} ${g('b_job')} by ${g('b_approach')}. Unlike ${g('b_alternative')} — which ${g('b_gap')} — ${g('b_product')} delivers ${g('b_outcome')}.`;
+  },
+};
+
+function copyStatement() {
+  const plain    = PLAIN_TEMPLATES[activeFw]();
+  const btn      = document.getElementById('copy-btn');
+  const origHTML = btn.innerHTML;
+
+  const done = () => {
+    btn.classList.add('ok');
+    btn.textContent = '✓ Copied';
+    setTimeout(() => { btn.classList.remove('ok'); btn.innerHTML = origHTML; }, 1500);
+  };
+
+  navigator.clipboard.writeText(plain).then(done).catch(() => {
+    const tmp = Object.assign(document.createElement('textarea'), {
+      value: plain, style: 'position:fixed;opacity:0;pointer-events:none',
+    });
+    document.body.appendChild(tmp);
+    tmp.select();
+    document.execCommand('copy');
+    document.body.removeChild(tmp);
+    done();
+  });
+}
+
+/* ─── Clear ───────────────────────────────────── */
+const FIELD_IDS = {
+  moore:   ['m_product','m_category','m_customer','m_need','m_benefit','m_competitor','m_differentiator'],
+  dunford: ['d_product','d_category','d_customer','d_outcome','d_alternative','d_capability','d_cost'],
+  blank:   ['b_product','b_customer','b_job','b_approach','b_alternative','b_gap','b_outcome'],
+};
+
+function clearAll() {
+  FIELD_IDS[activeFw].forEach(id => { document.getElementById(id).value = ''; });
+  buildPreview();
+}
+
+/* ─── Load example ────────────────────────────── */
+const EXAMPLES = {
+  moore: {
+    m_product:'Notion', m_category:'connected workspace',
+    m_customer:'knowledge workers and growing teams',
+    m_need:'waste hours switching between scattered tools just to get basic work done',
+    m_benefit:'connects notes, wikis, docs, and tasks in one flexible system the whole team can shape to how they work',
+    m_competitor:'a patchwork of separate apps for every function',
+    m_differentiator:'gives every team one place to work that bends to how they actually think',
+  },
+  dunford: {
+    d_product:'Notion', d_category:'connected workspace',
+    d_customer:'teams drowning in tool sprawl',
+    d_outcome:'one flexible system where all their work lives, without retraining the whole team',
+    d_alternative:'a patchwork of best-of-breed apps stitched together',
+    d_capability:'unifies notes, wikis, tasks, and databases in a single fully customisable space',
+    d_cost:'constant context-switching, duplicated information, and manual stitching between tools',
+  },
+  blank: {
+    b_product:'Notion', b_customer:'knowledge workers and ops teams',
+    b_job:'get structured work done without losing context',
+    b_approach:'consolidating notes, docs, tasks, and databases into one adaptable workspace',
+    b_alternative:'juggling Confluence, Jira, Google Docs, and Asana separately',
+    b_gap:'fragments focus through constant context-switching and leaves information scattered across tools',
+    b_outcome:'more time on actual work, less time managing tools and bridging information gaps',
+  },
+};
+
+function loadExample() {
+  Object.entries(EXAMPLES[activeFw]).forEach(([id, val]) => {
+    document.getElementById(id).value = val;
+  });
+  buildPreview();
+}
+
+/* ─── Wire inputs ─────────────────────────────── */
+document.querySelectorAll('.text-input, .textarea-input').forEach(el =>
+  el.addEventListener('input', buildPreview)
+);
+
+/* ─── Init ────────────────────────────────────── */
+buildPreview();
+</script>
+</body>
+</html>

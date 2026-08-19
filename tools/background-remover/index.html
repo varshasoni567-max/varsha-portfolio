@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Background Remover</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sand:         #F7F4EC;
+  --terra:        #D69C8C;
+  --golden:       #F0C9BA;
+  --near-black:   #131210;
+  --brown:        #6B6558;
+  --white:        #FFFFFF;
+  --border:       2px solid #131210;
+  --shadow-black: 4px 4px 0 #131210;
+  --shadow-terra: 4px 4px 0 #D69C8C;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  background: var(--sand);
+  color: var(--near-black);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Layout ─────────────────────────────────────────────── */
+.wrap {
+  position: relative;
+  z-index: 1;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 56px 40px 80px;
+}
+
+/* ── Header ─────────────────────────────────────────────── */
+header { margin-bottom: 24px; }
+
+h1 {
+  font-size: clamp(2rem, 5.5vw, 3rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  line-height: 1.05;
+  color: var(--near-black);
+}
+
+h1 .accent { color: var(--terra); }
+
+.subtitle {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--brown);
+  line-height: 1.55;
+  max-width: 480px;
+}
+
+/* ── Input card ─────────────────────────────────────────── */
+.input-card {
+  background: var(--white);
+  border: var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow-black);
+  padding: 32px;
+  margin-bottom: 24px;
+}
+
+/* ── Dropzone ───────────────────────────────────────────── */
+.dropzone {
+  border: 2.5px dashed var(--near-black);
+  border-radius: 8px;
+  background: var(--sand);
+  padding: 34px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.15s;
+}
+
+.dropzone:hover,
+.dropzone.drag-active { box-shadow: 3px 3px 0 var(--terra); }
+
+.dropzone svg { color: var(--terra); margin-bottom: 8px; }
+
+.dropzone-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--near-black);
+}
+
+.dropzone-sub {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--brown);
+}
+
+.err-text {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--terra);
+  margin-top: 12px;
+}
+
+/* ── Meta row ───────────────────────────────────────────── */
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.meta-left {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.file-chip {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid var(--near-black);
+  background: var(--golden);
+  flex-shrink: 0;
+}
+
+.stats {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--brown);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Pill buttons (shared) ─────────────────────────────── */
+.pill-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 1.1rem;
+  border: var(--border);
+  border-radius: 99px;
+  background: transparent;
+  color: var(--near-black);
+  cursor: pointer;
+  transition: box-shadow 0.12s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.pill-btn:hover  { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px,-1px); }
+.pill-btn:active { box-shadow: none; transform: translate(1px,1px); }
+.pill-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform: none; }
+
+.clear-btn {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 0.4rem 1.1rem;
+  border: var(--border);
+  border-radius: 99px;
+  background: var(--terra);
+  color: var(--near-black);
+  cursor: pointer;
+  transition: box-shadow 0.12s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.clear-btn:hover  { box-shadow: var(--shadow-black); transform: translate(-1px,-1px); }
+.clear-btn:active { box-shadow: none; transform: translate(2px,2px); }
+
+/* ── Control rows ───────────────────────────────────────── */
+.ctrl-row { margin-top: 20px; }
+
+.ctrl-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 0.5rem;
+}
+
+.ctrl-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--near-black);
+}
+
+.ctrl-val {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--terra);
+}
+
+/* ── Style picker (toggle pills) ────────────────────────── */
+.style-picker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+/* ── Section tag ────────────────────────────────────────── */
+.section-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 16px;
+}
+
+.sec-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.85rem;
+  background: var(--near-black);
+  color: var(--white);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: var(--border);
+  border-radius: 99px;
+}
+
+/* ── Output card ────────────────────────────────────────── */
+.output-card {
+  background: var(--white);
+  border: 2.5px solid var(--terra);
+  border-radius: 12px;
+  box-shadow: var(--shadow-terra);
+  padding: 32px;
+}
+
+.card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.card-top-label {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brown);
+}
+
+.card-top-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* ── Copy / download button ─────────────────────────────── */
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.85rem;
+  background: var(--golden);
+  border: var(--border);
+  border-radius: 99px;
+  cursor: pointer;
+  color: var(--near-black);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+  transition: box-shadow 0.12s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.copy-btn:hover  { box-shadow: 2px 2px 0 var(--near-black); transform: translate(-1px,-1px); }
+.copy-btn:active { box-shadow: none; transform: translate(1px,1px); }
+.copy-btn.ok     { background: #7B9E7B; color: var(--white); }
+.copy-btn.err    { background: var(--terra); color: var(--white); }
+.copy-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; transform: none; }
+.copy-btn svg    { flex-shrink: 0; }
+
+/* ── Compare grid ───────────────────────────────────────── */
+.compare-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.compare-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--brown);
+  margin-bottom: 6px;
+}
+
+.canvas-wrap {
+  border: 2px solid var(--near-black);
+  border-radius: 8px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.canvas-checker {
+  background-image:
+    linear-gradient(45deg, #e4dccb 25%, transparent 25%),
+    linear-gradient(-45deg, #e4dccb 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e4dccb 75%),
+    linear-gradient(-45deg, transparent 75%, #e4dccb 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-color: var(--sand);
+}
+
+canvas { display: block; width: 100%; height: auto; }
+
+/* ── Mobile ─────────────────────────────────────────────── */
+@media (max-width: 620px) {
+  .wrap { padding: 40px 24px 60px; }
+  .input-card, .output-card { padding: 22px; }
+  .compare-grid { grid-template-columns: 1fr; }
+}
+</style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<div class="wrap">
+
+  <header>
+    <h1>Background<span class="accent"> Remover</span></h1>
+    <p class="subtitle">Automatically removes the background from your photo.<br>Nothing ever leaves your browser.</p>
+  </header>
+
+  <!-- Input card -->
+  <div class="input-card">
+    <div class="dropzone" id="dropzone">
+      <input type="file" id="file-input" accept="image/*" style="display:none;">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </svg>
+      <div class="dropzone-title">Drop, click, or paste an image (Ctrl/Cmd+V)</div>
+      <div class="dropzone-sub">JPG, PNG or WEBP · resized to a max of 1500px</div>
+    </div>
+    <p class="err-text" id="upload-err" style="display:none;"></p>
+
+    <div id="editor" style="display:none;">
+      <div class="meta">
+        <div class="meta-left">
+          <span class="file-chip"></span>
+          <span class="stats" id="file-info">image.png · 0 × 0px</span>
+        </div>
+        <button class="pill-btn" id="btn-change">Change Image</button>
+      </div>
+
+      <div class="ctrl-row">
+        <div class="style-picker">
+          <button class="pill-btn" id="btn-redo" disabled>Reset Result</button>
+        </div>
+      </div>
+
+      <div class="meta" style="margin-top:24px;">
+        <span class="stats" id="proc-status">Ready</span>
+        <button class="clear-btn" id="btn-clear">Clear Image</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Output -->
+  <div class="section-row" id="result-tag-row" style="display:none;">
+    <span class="sec-tag">Result</span>
+  </div>
+
+  <div class="output-card" id="output-card" style="display:none;">
+    <div class="card-top">
+      <span class="card-top-label">Before / After</span>
+      <div class="card-top-actions">
+        <button class="copy-btn" id="btn-copy-img" disabled>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          Copy Image
+        </button>
+        <button class="copy-btn" id="btn-download" disabled>
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PNG
+        </button>
+      </div>
+    </div>
+    <div class="compare-grid">
+      <div>
+        <span class="compare-label">Original</span>
+        <div class="canvas-wrap"><canvas id="canvas-original"></canvas></div>
+      </div>
+      <div>
+        <span class="compare-label">Result</span>
+        <div class="canvas-wrap canvas-checker"><canvas id="canvas-result"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+
+</div>
+
+<script type="module">
+import { removeBackground, preload } from "https://esm.sh/@imgly/background-removal@1.7.0";
+
+(() => {
+  const MAX_DIM = 1500;
+
+  const dropzone   = document.getElementById('dropzone');
+  const fileInput  = document.getElementById('file-input');
+  const uploadErr  = document.getElementById('upload-err');
+  const editor     = document.getElementById('editor');
+  const fileInfo   = document.getElementById('file-info');
+  const btnChange  = document.getElementById('btn-change');
+  const procStatus = document.getElementById('proc-status');
+
+  const resultTagRow = document.getElementById('result-tag-row');
+  const outputCard    = document.getElementById('output-card');
+
+  const btnRedo = document.getElementById('btn-redo');
+  const btnClear  = document.getElementById('btn-clear');
+  const btnDownload = document.getElementById('btn-download');
+  const btnCopyImg  = document.getElementById('btn-copy-img');
+
+  const canvasOriginal = document.getElementById('canvas-original');
+  const canvasResult   = document.getElementById('canvas-result');
+  const ctxOriginal = canvasOriginal.getContext('2d', { willReadFrequently: true });
+  const ctxResult   = canvasResult.getContext('2d', { willReadFrequently: true });
+
+  let W = 0, H = 0;
+  let pristine = null;   // original decoded pixels, used as the "is an image loaded" guard
+  let aiResult = null;   // cached AI cutout, used by "Reset Result"
+  let currentFileName = 'image';
+  let hasResult = false;
+
+  // Best-effort: start fetching the model as soon as the page loads so it's
+  // ready (or further along) by the time someone uploads a photo.
+  preload().catch(() => {});
+
+  /* ── Upload wiring ─────────────────────────────── */
+  dropzone.addEventListener('click', () => fileInput.click());
+  dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag-active'); });
+  dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag-active'));
+  dropzone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropzone.classList.remove('drag-active');
+    if (e.dataTransfer.files?.length) handleFile(e.dataTransfer.files[0]);
+  });
+  fileInput.addEventListener('change', e => {
+    if (e.target.files?.length) handleFile(e.target.files[0]);
+  });
+  btnChange.addEventListener('click', () => fileInput.click());
+
+  document.addEventListener('paste', e => {
+    const items = e.clipboardData?.items;
+    if (!items) return;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        e.preventDefault();
+        const blob = item.getAsFile();
+        if (blob) handleFile(blob);
+        break;
+      }
+    }
+  });
+
+  function handleFile(file) {
+    uploadErr.style.display = 'none';
+    if (!file.type.startsWith('image/')) {
+      showUploadError('That file doesn’t look like an image. Try a JPG, PNG or WEBP.');
+      return;
+    }
+    currentFileName = file.name.replace(/\.[^.]+$/, '') || 'image';
+
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const img = new Image();
+      img.onload = () => setupCanvases(img, file);
+      img.onerror = () => showUploadError('Couldn’t read that image file. Try a different one.');
+      img.src = ev.target.result;
+    };
+    reader.onerror = () => showUploadError('Couldn’t read that file. Try again.');
+    reader.readAsDataURL(file);
+  }
+
+  function showUploadError(msg) {
+    uploadErr.textContent = '⚠ ' + msg;
+    uploadErr.style.display = 'block';
+  }
+
+  async function setupCanvases(img, file) {
+    let w = img.naturalWidth, h = img.naturalHeight;
+    const scale = Math.min(1, MAX_DIM / Math.max(w, h));
+    w = Math.max(1, Math.round(w * scale));
+    h = Math.max(1, Math.round(h * scale));
+    W = w; H = h;
+
+    [canvasOriginal, canvasResult].forEach(c => { c.width = w; c.height = h; });
+
+    ctxOriginal.clearRect(0, 0, w, h);
+    ctxOriginal.drawImage(img, 0, 0, w, h);
+    pristine = ctxOriginal.getImageData(0, 0, w, h).data.slice();
+    aiResult = null;
+
+    ctxResult.clearRect(0, 0, w, h);
+
+    fileInfo.textContent = `${file.name} · ${img.naturalWidth} × ${img.naturalHeight}px`;
+    dropzone.style.display = 'none';
+    editor.style.display = 'block';
+    resultTagRow.style.display = 'flex';
+    outputCard.style.display = 'block';
+
+    hasResult = false;
+    btnDownload.disabled = true;
+    btnCopyImg.disabled = true;
+    btnRedo.disabled = true;
+
+    await runRemoval();
+  }
+
+  /* ── AI background removal ─────────────────────── */
+  async function runRemoval() {
+    if (!pristine) return;
+    procStatus.textContent = 'Getting ready…';
+    btnDownload.disabled = true;
+    btnCopyImg.disabled = true;
+    btnRedo.disabled = true;
+
+    try {
+      const srcBlob = await new Promise(resolve => canvasOriginal.toBlob(resolve, 'image/png'));
+
+      const resultBlob = await removeBackground(srcBlob, {
+        progress: (key, current, total) => {
+          const pct = total ? Math.round((current / total) * 100) : 0;
+          procStatus.textContent = pct < 100 ? `Getting ready… ${pct}%` : 'Removing background…';
+        },
+      });
+
+      const url = URL.createObjectURL(resultBlob);
+      const resultImg = new Image();
+      await new Promise((resolve, reject) => {
+        resultImg.onload = resolve;
+        resultImg.onerror = reject;
+        resultImg.src = url;
+      });
+
+      ctxResult.clearRect(0, 0, W, H);
+      ctxResult.drawImage(resultImg, 0, 0, W, H);
+      URL.revokeObjectURL(url);
+
+      aiResult = ctxResult.getImageData(0, 0, W, H).data.slice();
+      hasResult = true;
+      btnDownload.disabled = false;
+      btnCopyImg.disabled = false;
+      btnRedo.disabled = false;
+      procStatus.textContent = 'Ready';
+    } catch (err) {
+      console.error(err);
+      procStatus.textContent = '⚠ Background removal failed — try a smaller image or reload the page.';
+    }
+  }
+
+  btnRedo.addEventListener('click', () => {
+    if (!aiResult) return;
+    ctxResult.putImageData(new ImageData(aiResult.slice(), W, H), 0, 0);
+  });
+
+  /* ── Download ───────────────────────────────────── */
+  btnDownload.addEventListener('click', () => {
+    if (!hasResult) return;
+    canvasResult.toBlob(blob => {
+      if (!blob) return;
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${currentFileName}-no-bg.png`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      const svgIcon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`;
+      btnDownload.classList.add('ok');
+      btnDownload.textContent = '✓ Downloaded';
+      setTimeout(() => {
+        btnDownload.classList.remove('ok');
+        btnDownload.innerHTML = `${svgIcon} Download PNG`;
+      }, 1500);
+    }, 'image/png');
+  });
+
+  /* ── Copy to clipboard ──────────────────────────── */
+  btnCopyImg.addEventListener('click', () => {
+    if (!hasResult) return;
+    const copyIcon = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+
+    const flash = (ok, label) => {
+      btnCopyImg.classList.toggle('ok', ok);
+      btnCopyImg.classList.toggle('err', !ok);
+      btnCopyImg.textContent = label;
+      setTimeout(() => {
+        btnCopyImg.classList.remove('ok', 'err');
+        btnCopyImg.innerHTML = `${copyIcon} Copy Image`;
+      }, 1500);
+    };
+
+    if (!navigator.clipboard?.write || typeof ClipboardItem === 'undefined') {
+      flash(false, '⚠ Not supported');
+      return;
+    }
+
+    canvasResult.toBlob(blob => {
+      if (!blob) { flash(false, '⚠ Copy failed'); return; }
+      navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })])
+        .then(() => flash(true, '✓ Copied'))
+        .catch(() => flash(false, '⚠ Copy failed'));
+    }, 'image/png');
+  });
+
+  /* ── Clear / reset ──────────────────────────────── */
+  btnClear.addEventListener('click', () => {
+    W = 0; H = 0; pristine = null; aiResult = null; hasResult = false;
+    fileInput.value = '';
+    editor.style.display = 'none';
+    dropzone.style.display = 'block';
+    resultTagRow.style.display = 'none';
+    outputCard.style.display = 'none';
+    uploadErr.style.display = 'none';
+    procStatus.textContent = 'Ready';
+    btnDownload.disabled = true;
+    btnCopyImg.disabled = true;
+    btnRedo.disabled = true;
+    const ctxo = canvasOriginal.getContext('2d'); ctxo.clearRect(0, 0, canvasOriginal.width, canvasOriginal.height);
+    const ctxr = canvasResult.getContext('2d'); ctxr.clearRect(0, 0, canvasResult.width, canvasResult.height);
+  });
+})();
+</script>
+</body>
+</html>
