@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Builder Skill | Varsha Soni</title>
+<meta name="description" content="A free Claude skill that turns your case studies, workflows, or tools into a full portfolio site: homepage, CV, and case study pages included. No default templates, no starting from a blank page.">
+
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://varshameansrain.com/portfolio-builder.html">
+<meta property="og:title" content="Portfolio Builder Skill | Varsha Soni">
+<meta property="og:description" content="A free Claude skill that turns your case studies, workflows, or tools into a full portfolio site: homepage, CV, and case study pages included. No default templates, no starting from a blank page.">
+<meta property="og:image" content="https://varshameansrain.com/images/varsha.png">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Portfolio Builder Skill | Varsha Soni">
+<meta name="twitter:description" content="A free Claude skill that turns your case studies, workflows, or tools into a full portfolio site: homepage, CV, and case study pages included. No default templates, no starting from a blank page.">
+<meta name="twitter:image" content="https://varshameansrain.com/images/varsha.png">
+<style>
+  :root {
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bg:     #F7F4EC;
+    --ink:    #131210;
+    --pink:   #D69C8C;
+    --card:   #FFFFFF;
+    --muted:  #6B6558;
+    --line:   #131210;
+    --shadow: 5px 5px 0 var(--line);
+    --shadow-sm: 3px 3px 0 var(--line);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, .display {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 32px; }
+  a { color: inherit; text-decoration: none; }
+
+  .label {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ── BUTTONS ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 14px;
+    padding: 13px 22px;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: var(--card);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translate(2px, 2px); box-shadow: 1px 1px 0 var(--line); }
+  .btn-dark { background: var(--ink); color: var(--bg); }
+  .btn-pink { background: var(--pink); color: var(--ink); }
+  .btn-sm { padding: 9px 16px; font-size: 13px; box-shadow: 2px 2px 0 var(--line); }
+  .btn-sm:hover { box-shadow: 0 0 0 var(--line); }
+
+  /* ── NAV ── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    background: rgba(247,244,236,0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid var(--line);
+  }
+  .nav-inner {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 32px;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+  }
+  .nav-brand {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .nav-brand .dot { width: 10px; height: 10px; background: var(--pink); border: 2px solid var(--line); border-radius: 3px; display: inline-block; }
+  .nav-links { display: flex; align-items: center; gap: 28px; }
+  .nav-links a {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ink);
+    opacity: 0.75;
+  }
+  .nav-links a:hover { opacity: 1; }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+
+  /* ── HERO ── */
+  .hero { padding: 76px 0 48px; }
+  .hero h1 {
+    font-size: clamp(13px, calc((100vw - 64px) / 23), 46px);
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  .hero-sub {
+    margin-top: 24px;
+    font-size: 18px;
+    color: var(--muted);
+    max-width: 56ch;
+    line-height: 1.6;
+  }
+  .hero-cta { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+
+  /* ── SECTION SHELL ── */
+  section.block { padding: 48px 0; }
+  #included.block { padding-top: 0; }
+  .sec-head { text-align: center; margin-bottom: 32px; }
+  .sec-head .label { display: block; margin-bottom: 10px; }
+  .sec-head h2 { font-size: clamp(26px, 3.6vw, 36px); }
+  .sec-head p { color: var(--muted); font-size: 17px; margin: 16px auto 0; }
+
+  /* ── INCLUDED CARDS ── */
+  .included-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .included-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 22px;
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+  }
+  .included-card:hover { transform: translate(-2px,-2px); box-shadow: var(--shadow); }
+  .included-card .num {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pink);
+  }
+  .included-card h3 { font-size: 18px; }
+  .included-card p { color: var(--muted); font-size: 14.5px; }
+  .included-note { color: var(--muted); font-size: clamp(10px, calc((100vw - 64px) / 56), 15px); white-space: nowrap; text-align: center; margin: 32px auto 0; }
+
+  /* ── HOW TO USE ── */
+  .steps { display: flex; flex-direction: column; gap: 20px; max-width: 640px; margin: 0 auto; }
+  .step {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    padding: 24px 22px;
+    background: var(--card);
+    border: 2px solid var(--line);
+    border-radius: 16px;
+    box-shadow: var(--shadow-sm);
+  }
+  .step-num {
+    flex: 0 0 auto;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pink);
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: 15px;
+  }
+  .step-body h3 { font-size: 16px; margin-bottom: 6px; }
+  .step-body p { color: var(--muted); font-size: 14.5px; }
+  .step-body code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1px 5px;
+  }
+  .step-body a { font-weight: 700; color: var(--pink); }
+  .step-body a:hover { text-decoration: underline; }
+
+  /* ── CLOSING ── */
+  #closing.block { padding: 0 0 40px; }
+  #closing .wrap { text-align: center; }
+  #closing p { font-size: 19px; color: var(--ink); }
+  #closing a { font-weight: 700; color: var(--pink); }
+  #closing a:hover { text-decoration: underline; }
+
+  footer {
+    padding: 40px 32px 56px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  @media (max-width: 900px) {
+    .included-grid { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+    .hero { padding: 52px 0 36px; }
+    section.block { padding: 44px 0; }
+  }
+</style>
+<script>
+  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand">Hi, I'm Varsha Soni.</a>
+    <div class="nav-right">
+      <a href="cv.html" class="btn btn-sm" target="_blank">CV ↓</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-inner">
+      <h1>Build a portfolio website like this one.</h1>
+      <p class="hero-sub">A free Claude skill that turns your case studies, workflows, or tools into a full portfolio site: homepage, CV, and case study pages included.<br>No default templates, no starting from a blank page.</p>
+      <div class="hero-cta">
+        <a href="downloads/portfolio-builder.skill" class="btn btn-dark" download>Download the skill</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WHAT'S INCLUDED ── -->
+<section id="included" class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="label">What's included</span>
+      <h2>One system</h2>
+      <p>It starts by asking what you already have: a CV, old case studies, project docs.<br>It only interviews you for whatever's missing, so the more material you hand over, the shorter the interview.</p>
+    </div>
+    <div class="included-grid">
+      <div class="included-card">
+        <span class="num">01</span>
+        <h3>Homepage with case studies</h3>
+        <p>A hero, a horizontally-scrolling case study section, and a contact block — the same shell this site uses.</p>
+      </div>
+      <div class="included-card">
+        <span class="num">02</span>
+        <h3>A CV page</h3>
+        <p>A clean, printable page built from the same type scale and spacing as the rest of the site.</p>
+      </div>
+      <div class="included-card">
+        <span class="num">03</span>
+        <h3>One page per case study</h3>
+        <p>Built from your real answers, not filler — full write-ups linked straight off the homepage cards.</p>
+      </div>
+    </div>
+    <p class="included-note">All three share this site's layout and spacing — just with your own colors and content dropped in.</p>
+  </div>
+</section>
+
+<!-- ── HOW TO USE IT ── -->
+<section id="how-to" class="block">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="label">How to use it</span>
+      <h2>Two steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <span class="step-num">1</span>
+        <div class="step-body">
+          <h3>Turn on Code execution and file creation</h3>
+          <p>In <code>Settings</code>, enable Code execution and file creation. Then upload the skill file under <code>Customize &gt; Skills</code>. <a href="https://support.claude.com/en/articles/12512180-use-skills-in-claude" target="_blank" rel="noopener">Full instructions ↗</a></p>
+        </div>
+      </div>
+      <div class="step">
+        <span class="step-num">2</span>
+        <div class="step-body">
+          <h3>Tell Claude what you want</h3>
+          <p>Just say you want to build a portfolio, and Claude takes it from there.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CLOSING ── -->
+<section id="closing" class="block">
+  <div class="wrap">
+    <p>This site was built with it. <a href="index.html">→ See it here</a></p>
+  </div>
+</section>
+
+<footer>© 2026 Varsha Soni · Built with Claude</footer>
+
+</body>
+</html>
